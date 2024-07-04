@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'package:admin/models/question_type_model.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'models/survey_model.dart';
 import 'question.dart';
 
 final _formKey = GlobalKey<FormState>();
@@ -10,13 +14,14 @@ class AdminDash extends StatefulWidget {
   State<AdminDash> createState() => _AdminDashState();
 }
 
-const List<String> list = <String>[
-  'Logical',
-  'Single Choice',
-  'Multiple Choice',
-  'Numeric',
-  'Text'
-];
+List<QuestionType> list = List.generate(
+  QuestionTypeEnum.values.length - 2,
+  (index) => QuestionType(
+    questionsTypeId: index + 1,
+    questionType: QuestionTypeEnum.values[index],
+    questions: [], // Initialize with an empty list of questions
+  ),
+);
 
 class _AdminDashState extends State<AdminDash> {
   final _nameController = TextEditingController();
@@ -24,14 +29,19 @@ class _AdminDashState extends State<AdminDash> {
   final _startDateController = TextEditingController();
   final _endDateController = TextEditingController();
 
-  String dropdownValue = list.first;
-  DateTime? selectedDate;
-  // int _selectedValue = 1;
+  QuestionType dropdownValue = list.first;
+  DateTime? selectedStartDate;
+  DateTime? selectedEndDate;
   int number = 1;
   List<TextEditingController> _controllers = [];
   List<int> _values = [];
   List<bool> _isChecked = [];
   List<Widget> quests = [];
+
+  String sName = '';
+  String sDesc = '';
+  String sDate = '';
+  String eDate = '';
 
   @override
   void initState() {
@@ -45,9 +55,27 @@ class _AdminDashState extends State<AdminDash> {
     setState(() {
       number++;
       _controllers.add(TextEditingController(text: "Option $number"));
-      _values.add(number);
+      // _values.add(number);
       _isChecked = List<bool>.filled(number, false);
     });
+  }
+
+  Future<void> postSurvey(Survey survey) async {
+    final url = Uri.parse('http://localhost:3106/api/survey');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(survey.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      print('Survey saved successfully');
+    } else {
+      print('Failed to save survey');
+      print(response.body);
+    }
   }
 
   @override
@@ -83,59 +111,85 @@ class _AdminDashState extends State<AdminDash> {
                     children: [
                       TextFormField(
                         controller: _nameController,
+                        onChanged: (value) {
+                          setState(() {
+                            sName = value;
+                          });
+                        },
                         decoration: const InputDecoration(
                           labelText: "Survey Name",
                           border: OutlineInputBorder(),
                         ),
                         validator: (name) =>
-                            name!.length == 0 ? "Nertei baih ystoi" : null,
+                            name!.isEmpty ? "Nertei baih ystoi" : null,
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
                         controller: _descriptionController,
+                        onChanged: (value) {
+                          setState(() {
+                            sDesc = value;
+                          });
+                        },
                         decoration: const InputDecoration(
                           labelText: "Description",
                           border: OutlineInputBorder(),
                         ),
-                        validator: (description) => description!.length == 0
+                        validator: (description) => description!.isEmpty
                             ? "Zaaval descriptiontei baih ystoi"
                             : null,
                       ),
                       const SizedBox(height: 10),
-                      InputDatePickerFormField(
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2101),
-                        fieldLabelText: 'Start Date',
-                        errorFormatText: 'Invalid date',
-                        errorInvalidText: 'Invalid date',
-                        onDateSubmitted: (date) {
-                          setState(() {
-                            selectedDate = date;
-                          });
+                      TextFormField(
+                        controller: _startDateController,
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2101),
+                          );
+                          if (pickedDate != null) {
+                            setState(() {
+                              selectedStartDate = pickedDate;
+                              _startDateController.text =
+                                  pickedDate.toIso8601String().split('T').first;
+                            });
+                          }
                         },
-                        onDateSaved: (date) {
-                          setState(() {
-                            selectedDate = date;
-                          });
-                        },
+                        decoration: const InputDecoration(
+                          labelText: "Start Date",
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) => {sDate = value},
+                        validator: (date) =>
+                            date!.isEmpty ? "Start date is required" : null,
                       ),
                       const SizedBox(height: 10),
-                      InputDatePickerFormField(
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2101),
-                        fieldLabelText: 'End Date',
-                        errorFormatText: 'Invalid date',
-                        errorInvalidText: 'Invalid date',
-                        onDateSubmitted: (date) {
-                          setState(() {
-                            selectedDate = date;
-                          });
+                      TextFormField(
+                        controller: _endDateController,
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2101),
+                          );
+                          if (pickedDate != null) {
+                            setState(() {
+                              selectedEndDate = pickedDate;
+                              _endDateController.text =
+                                  pickedDate.toIso8601String().split('T').first;
+                            });
+                          }
                         },
-                        onDateSaved: (date) {
-                          setState(() {
-                            selectedDate = date;
-                          });
-                        },
+                        onChanged: (value) => {eDate = value},
+                        decoration: const InputDecoration(
+                          labelText: "End Date",
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (date) =>
+                            date!.isEmpty ? "End date is required" : null,
                       ),
                     ],
                   ),
@@ -147,19 +201,30 @@ class _AdminDashState extends State<AdminDash> {
                     return quests[index];
                   },
                   separatorBuilder: (BuildContext context, int index) =>
-                      SizedBox(
+                      const SizedBox(
                     height: 10,
                   ),
                   itemCount: quests.length,
                 ),
-                //...quests,
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        _formKey.currentState!.validate();
+                        print(QuestionTypeEnum.values);
+                        if (_formKey.currentState!.validate()) {
+                          final survey = Survey(
+                            surveyId: 1,
+                            surveyStatus: 'Active',
+                            surveyName: sName,
+                            surveyDescription: sDesc,
+                            surveyStartDate: selectedStartDate!,
+                            surveyEndDate: selectedEndDate!,
+                            questions: [],
+                          );
+                          postSurvey(survey);
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromARGB(255, 105, 4, 114),
@@ -182,7 +247,7 @@ class _AdminDashState extends State<AdminDash> {
             quests.add(QuestionWidget());
           });
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         tooltip: "Add questions",
       ),
     );

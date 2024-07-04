@@ -1,3 +1,9 @@
+import 'dart:convert';
+import 'package:admin/models/answer_model.dart';
+import 'package:http/http.dart' as http;
+
+import 'package:admin/models/question_model.dart';
+import 'package:admin/models/question_type_model.dart';
 import 'package:flutter/material.dart';
 
 class QuestionWidget extends StatefulWidget {
@@ -5,16 +11,18 @@ class QuestionWidget extends StatefulWidget {
   _QuestionWidgetState createState() => _QuestionWidgetState();
 }
 
-List<String> list = <String>[
-  'Logical',
-  'Single Choice',
-  'Multiple Choice',
-  'Numeric',
-  'Text'
-];
+List<QuestionType> list = List.generate(
+  QuestionTypeEnum.values.length,
+  (index) => QuestionType(
+    questionsTypeId: index + 1,
+    questionType: QuestionTypeEnum.values[index],
+    questions: [],
+  ),
+);
 
 class _QuestionWidgetState extends State<QuestionWidget> {
-  String dropdownValue = list.first;
+  bool isMandatory = false;
+  QuestionType dropdownValue = list.first;
   DateTime? selectedDate;
   int _selectedValue = 1;
   int number = 1;
@@ -22,14 +30,39 @@ class _QuestionWidgetState extends State<QuestionWidget> {
   List<int> _values = [];
   List<bool> _isChecked = [];
   List<Widget> quests = [];
+  final _questionController = TextEditingController();
+  String ques = '';
+  List<Answer> answer = [];
 
   void addOptions() {
     setState(() {
       _controllers.add(TextEditingController(text: "Option $number"));
       _isChecked.add(false);
       _values.add(_values.length + 1);
+      answer.add(Answer(
+          answersId: _values.length,
+          questionsId: '',
+          answerText: "Option $number"));
       number++;
     });
+  }
+
+  Future<void> postSurvey(Question survey) async {
+    final url = Uri.parse('http://localhost:3106/api/question');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(survey.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      print('Survey saved successfully');
+    } else {
+      print('Failed to save survey');
+      print(response.body);
+    }
   }
 
   @override
@@ -49,11 +82,17 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                 child: Container(
                   color: Colors.grey.withOpacity(0.08),
                   child: TextFormField(
+                    controller: _questionController,
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.only(left: 10),
                       labelText: "Асуулт",
                       labelStyle: TextStyle(color: Colors.grey),
                     ),
+                    onChanged: (value) {
+                      setState(() {
+                        ques = value;
+                      });
+                    },
                   ),
                 ),
               ),
@@ -70,17 +109,18 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: DropdownButton<String>(
+                child: DropdownButton<QuestionType>(
                   value: dropdownValue,
                   icon: const Icon(Icons.arrow_drop_down),
                   elevation: 16,
-                  items: list.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
+                  items: list.map<DropdownMenuItem<QuestionType>>(
+                      (QuestionType value) {
+                    return DropdownMenuItem<QuestionType>(
                       value: value,
-                      child: Text(value),
+                      child: Text(value.toString()),
                     );
                   }).toList(),
-                  onChanged: (String? value) {
+                  onChanged: (QuestionType? value) {
                     setState(() {
                       dropdownValue = value!;
                     });
@@ -91,7 +131,8 @@ class _QuestionWidgetState extends State<QuestionWidget> {
           ),
           Column(
             children: List.generate(_controllers.length, (index) {
-              if (dropdownValue == "Multiple Choice") {
+              if (dropdownValue.questionType ==
+                  QuestionTypeEnum.MultipleChoice) {
                 return Container(
                   padding: EdgeInsets.all(8.0),
                   child: Row(
@@ -111,6 +152,15 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                           decoration: InputDecoration(
                             enabledBorder: InputBorder.none,
                           ),
+                          onChanged: (value) {
+                            setState(() {
+                              answer[index] = Answer(
+                                answersId: index + 1,
+                                questionsId: '',
+                                answerText: value,
+                              );
+                            });
+                          },
                         ),
                       ),
                       IconButton(
@@ -118,6 +168,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                           setState(() {
                             _controllers.removeAt(index);
                             _isChecked.removeAt(index);
+                            answer.removeAt(index);
                           });
                         },
                         icon: Icon(Icons.cancel_outlined),
@@ -145,6 +196,15 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                           decoration: InputDecoration(
                             enabledBorder: InputBorder.none,
                           ),
+                          onChanged: (value) {
+                            setState(() {
+                              answer[index] = Answer(
+                                answersId: index + 1,
+                                questionsId: '',
+                                answerText: value,
+                              );
+                            });
+                          },
                         ),
                       ),
                       IconButton(
@@ -152,6 +212,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                           setState(() {
                             _controllers.removeAt(index);
                             _values.removeAt(index);
+                            answer.removeAt(index);
                           });
                         },
                         icon: Icon(Icons.cancel_outlined),
@@ -169,21 +230,53 @@ class _QuestionWidgetState extends State<QuestionWidget> {
               child: InkWell(
                 onTap: addOptions,
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Radio(
-                      value: 50,
-                      groupValue: _selectedValue,
-                      onChanged: (int? value) {
-                        setState(() {
-                          _selectedValue = value!;
-                        });
-                      },
+                    Container(
+                      child: Row(
+                        children: [
+                          Radio(
+                            value: 50,
+                            groupValue: _selectedValue,
+                            onChanged: (int? value) {
+                              setState(() {
+                                _selectedValue = value!;
+                              });
+                            },
+                          ),
+                          Text(
+                            "Add option",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    Text(
-                      "Add option",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
+                    Container(
+                      child: Row(
+                        children: [
+                          Checkbox(
+                              value: isMandatory,
+                              onChanged: (value) {
+                                setState(() {
+                                  isMandatory = value!;
+                                });
+                              }),
+                          ElevatedButton(
+                              onPressed: () {
+                                final question = Question(
+                                    questionsId: 5,
+                                    questionsTypeId: "665e90a44026f697ef6234eb",
+                                    questionText: ques,
+                                    surveyId: "66612b52caf041775985b0ef",
+                                    isMandatory: isMandatory,
+                                    answers: answer);
+                                postSurvey(question);
+                              },
+                              child: Text("Save")),
+                        ],
                       ),
                     ),
                   ],
