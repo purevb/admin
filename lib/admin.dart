@@ -39,8 +39,8 @@ class _AdminDashState extends State<AdminDash> {
   DateTime? selectedEndDate;
   int number = 1;
   List<TextEditingController> _controllers = [];
-  List<int> _values = [];
-  List<bool> _isChecked = [];
+  // List<int> _values = [];
+  // List<bool> _isChecked = [];
   List<Widget> quests = [];
   bool active = false;
   String sName = '';
@@ -53,8 +53,8 @@ class _AdminDashState extends State<AdminDash> {
   void initState() {
     super.initState();
     _controllers.add(TextEditingController(text: "Option $number"));
-    _values.add(0);
-    _isChecked = List<bool>.filled(number, false);
+    // _values.add(0);
+    // _isChecked = List<bool>.filled(number, false);
     getData();
   }
 
@@ -74,12 +74,13 @@ class _AdminDashState extends State<AdminDash> {
     }
   }
 
+  // List.generate(Question, (index) => null)
   void addOptions() {
     setState(() {
       number++;
       _controllers.add(TextEditingController(text: "Option $number"));
       // _values.add(number);
-      _isChecked = List<bool>.filled(number, false);
+      // _isChecked = List<bool>.filled(number, false);
     });
   }
 
@@ -123,6 +124,7 @@ class _AdminDashState extends State<AdminDash> {
                 vertical: height * 0.02, horizontal: width * 0.3),
             child: Column(
               children: [
+                Text(pastSurveys?[0].surveyDescription ?? "978"),
                 Container(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
