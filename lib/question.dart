@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:admin/models/answer_model.dart';
+import 'package:admin/services/answer_service.dart';
+import 'package:admin/services/question_service.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:admin/models/question_model.dart';
@@ -21,6 +23,20 @@ List<QuestionType> list = List.generate(
 );
 
 class _QuestionWidgetState extends State<QuestionWidget> {
+  List<Answer>? pastAnswers;
+  List<Question>? pastQuestions;
+  var isLoaded = false;
+  getData() async {
+    pastAnswers = await RemoteService().getAnswer();
+    pastQuestions = await QuestionRemoteService().getQuestion();
+    print(pastQuestions![0].questionsTypeID.toString());
+    if (pastAnswers != null && pastQuestions != null) {
+      setState(() {
+        isLoaded = true;
+      });
+    }
+  }
+
   bool isMandatory = false;
   QuestionType dropdownValue = list.first;
   DateTime? selectedDate;
@@ -47,7 +63,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
     });
   }
 
-  Future<void> postSurvey(Question survey) async {
+  Future<void> postQuestion(Question survey) async {
     final url = Uri.parse('http://localhost:3106/api/question');
     final response = await http.post(
       url,
@@ -58,9 +74,9 @@ class _QuestionWidgetState extends State<QuestionWidget> {
     );
 
     if (response.statusCode == 200) {
-      print('Survey saved successfully');
+      print('question saved successfully');
     } else {
-      print('Failed to save survey');
+      print('Failed to save question');
       print(response.body);
     }
   }
@@ -267,13 +283,14 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                           ElevatedButton(
                               onPressed: () {
                                 final question = Question(
-                                    questionsId: 5,
-                                    questionsTypeId: "665e90a44026f697ef6234eb",
-                                    questionText: ques,
-                                    surveyId: "66612b52caf041775985b0ef",
-                                    isMandatory: isMandatory,
-                                    answers: answer);
-                                postSurvey(question);
+                                  questionsID: 5,
+                                  questionsTypeID: "665e90a44026f697ef6234eb",
+                                  questionText: ques,
+                                  surveyID: "66612b52caf041775985b0ef",
+                                  isMandatory: isMandatory,
+                                  answers: [],
+                                );
+                                postQuestion(question);
                               },
                               child: Text("Save")),
                         ],

@@ -1,8 +1,18 @@
+import 'dart:convert';
+
 import 'package:admin/models/question_model.dart';
+
+List<Survey> postFromJson(String str) {
+  final jsonData = json.decode(str);
+  return List<Survey>.from(jsonData['surveys'].map((x) => Survey.fromJson(x)));
+}
+
+String postToJson(List<Survey> data) =>
+    jsonEncode({"surveys": List<dynamic>.from(data.map((x) => x.toJson()))});
 
 class Survey {
   int surveyId;
-  String surveyStatus;
+  bool surveyStatus;
   String surveyName;
   String surveyDescription;
   DateTime surveyStartDate;

@@ -1,9 +1,19 @@
-class Answer {
-  int answersId;
-  String questionsId;
-  String answerText;
+import 'dart:convert';
 
-  Answer({
+List<Answer> postFromJson(String str) {
+  final jsonData = json.decode(str);
+  return List<Answer>.from(jsonData['answer'].map((x) => Answer.fromJson(x)));
+}
+
+String postToJson(List<Answer> data) =>
+    json.encode({"answer": List<dynamic>.from(data.map((x) => x.toJson()))});
+
+class Answer {
+  final int answersId;
+  final String questionsId;
+  final String answerText;
+
+  const Answer({
     required this.answersId,
     required this.questionsId,
     required this.answerText,
@@ -11,17 +21,15 @@ class Answer {
 
   factory Answer.fromJson(Map<String, dynamic> json) {
     return Answer(
-      answersId: json['answers_id'],
-      questionsId: json['questions_id'],
-      answerText: json['answer_text'],
+      answersId: json['answersId'],
+      questionsId: json['questionsId'],
+      answerText: json['answerText'],
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'answers_id': answersId,
-      'questions_id': questionsId,
-      'answer_text': answerText,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        "answersId": answersId,
+        "questionsId": questionsId,
+        "answerText": answerText
+      };
 }

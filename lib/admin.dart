@@ -1,5 +1,10 @@
 import 'dart:convert';
+import 'package:admin/models/answer_model.dart';
+import 'package:admin/models/question_model.dart';
 import 'package:admin/models/question_type_model.dart';
+import 'package:admin/services/answer_service.dart';
+import 'package:admin/services/question_service.dart';
+import 'package:admin/services/survey_services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'models/survey_model.dart';
@@ -37,8 +42,9 @@ class _AdminDashState extends State<AdminDash> {
   List<int> _values = [];
   List<bool> _isChecked = [];
   List<Widget> quests = [];
-
+  bool active = false;
   String sName = '';
+
   String sDesc = '';
   String sDate = '';
   String eDate = '';
@@ -49,6 +55,23 @@ class _AdminDashState extends State<AdminDash> {
     _controllers.add(TextEditingController(text: "Option $number"));
     _values.add(0);
     _isChecked = List<bool>.filled(number, false);
+    getData();
+  }
+
+  // List<Answer>? pastAnswers;
+  // List<Question>? pastQuestions;
+  List<Survey>? pastSurveys;
+  var isLoaded = false;
+  getData() async {
+    // pastAnswers = await RemoteService().getAnswer();
+    // pastQuestions = await QuestionRemoteService().getQuestion();
+    pastSurveys = await SurveyRemoteService().getSurvey();
+    // print(pastQuestions![0].questionsTypeID.toString());
+    if (pastSurveys != null) {
+      setState(() {
+        isLoaded = true;
+      });
+    }
   }
 
   void addOptions() {
@@ -121,7 +144,7 @@ class _AdminDashState extends State<AdminDash> {
                           border: OutlineInputBorder(),
                         ),
                         validator: (name) =>
-                            name!.isEmpty ? "Nertei baih ystoi" : null,
+                            name!.isEmpty ? "Survey name is required" : null,
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
@@ -136,7 +159,7 @@ class _AdminDashState extends State<AdminDash> {
                           border: OutlineInputBorder(),
                         ),
                         validator: (description) => description!.isEmpty
-                            ? "Zaaval descriptiontei baih ystoi"
+                            ? "Description is required"
                             : null,
                       ),
                       const SizedBox(height: 10),
@@ -195,6 +218,9 @@ class _AdminDashState extends State<AdminDash> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                // Displaying the number of past surveys
+                if (pastSurveys != null)
+                  Text('Number of past surveys: ${pastSurveys!.length}'),
                 ListView.separated(
                   shrinkWrap: true,
                   itemBuilder: (BuildContext context, int index) {
@@ -212,18 +238,27 @@ class _AdminDashState extends State<AdminDash> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        print(QuestionTypeEnum.values);
                         if (_formKey.currentState!.validate()) {
-                          final survey = Survey(
-                            surveyId: 1,
-                            surveyStatus: 'Active',
-                            surveyName: sName,
-                            surveyDescription: sDesc,
-                            surveyStartDate: selectedStartDate!,
-                            surveyEndDate: selectedEndDate!,
-                            questions: [],
-                          );
-                          postSurvey(survey);
+                          bool isActive = selectedEndDate != null &&
+                              selectedEndDate!.isAfter(DateTime.now());
+                          if (selectedStartDate != null &&
+                              selectedEndDate != null) {
+                            final survey = Survey(
+                              surveyId:
+                                  pastSurveys?.length ?? 0, // ajillahgu bgaa
+                              surveyStatus: isActive,
+                              surveyName: sName,
+                              surveyDescription: sDesc,
+                              surveyStartDate: selectedStartDate!,
+                              surveyEndDate: selectedEndDate!,
+                              questions: [],
+                            );
+
+                            postSurvey(survey);
+                          } else {
+                            // Handle the case where dates are null
+                            print('Start and end dates are required');
+                          }
                         }
                       },
                       style: ElevatedButton.styleFrom(
