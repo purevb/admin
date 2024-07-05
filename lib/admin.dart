@@ -24,7 +24,7 @@ List<QuestionType> list = List.generate(
   (index) => QuestionType(
     questionsTypeId: index + 1,
     questionType: QuestionTypeEnum.values[index],
-    questions: [], // Initialize with an empty list of questions
+    questions: [],
   ),
 );
 
@@ -124,7 +124,7 @@ class _AdminDashState extends State<AdminDash> {
                 vertical: height * 0.02, horizontal: width * 0.3),
             child: Column(
               children: [
-                Text(pastSurveys?[0].surveyDescription ?? "978"),
+                //Text(pastSurveys![0].surveyDescription),
                 Container(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
@@ -253,7 +253,7 @@ class _AdminDashState extends State<AdminDash> {
                               surveyDescription: sDesc,
                               surveyStartDate: selectedStartDate!,
                               surveyEndDate: selectedEndDate!,
-                              questions: [],
+                              // questions: [],
                             );
 
                             postSurvey(survey);
