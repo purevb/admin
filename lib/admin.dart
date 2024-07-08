@@ -19,14 +19,14 @@ class AdminDash extends StatefulWidget {
   State<AdminDash> createState() => _AdminDashState();
 }
 
-List<QuestionType> list = List.generate(
-  QuestionTypeEnum.values.length - 2,
-  (index) => QuestionType(
-    questionsTypeId: index + 1,
-    questionType: QuestionTypeEnum.values[index],
-    questions: [],
-  ),
-);
+// List<QuestionType> list = List.generate(
+//   QuestionTypeEnum.values.length - 2,
+//   (index) => QuestionType(
+//     questionsTypeId: index + 1,
+//     questionType: QuestionTypeEnum.values[index],
+//     questions: [],
+//   ),
+// );
 
 class _AdminDashState extends State<AdminDash> {
   final _nameController = TextEditingController();
@@ -34,7 +34,6 @@ class _AdminDashState extends State<AdminDash> {
   final _startDateController = TextEditingController();
   final _endDateController = TextEditingController();
 
-  QuestionType dropdownValue = list.first;
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
   int number = 1;
@@ -220,21 +219,6 @@ class _AdminDashState extends State<AdminDash> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Displaying the number of past surveys
-                if (pastSurveys != null)
-                  Text('Number of past surveys: ${pastSurveys!.length}'),
-                ListView.separated(
-                  shrinkWrap: true,
-                  itemBuilder: (BuildContext context, int index) {
-                    return quests[index];
-                  },
-                  separatorBuilder: (BuildContext context, int index) =>
-                      const SizedBox(
-                    height: 10,
-                  ),
-                  itemCount: quests.length,
-                ),
-                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -258,7 +242,6 @@ class _AdminDashState extends State<AdminDash> {
 
                             postSurvey(survey);
                           } else {
-                            // Handle the case where dates are null
                             print('Start and end dates are required');
                           }
                         }
@@ -273,6 +256,21 @@ class _AdminDashState extends State<AdminDash> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 20),
+
+                if (pastSurveys != null)
+                  // Text('Number of past surveys: ${pastSurveys!.length}'),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    itemBuilder: (BuildContext context, int index) {
+                      return quests[index];
+                    },
+                    separatorBuilder: (BuildContext context, int index) =>
+                        const SizedBox(
+                      height: 10,
+                    ),
+                    itemCount: quests.length,
+                  ),
               ],
             ),
           ),

@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:admin/models/answer_model.dart';
+import 'package:admin/models/survey_model.dart';
 import 'package:admin/services/answer_service.dart';
 import 'package:admin/services/question_service.dart';
+import 'package:admin/services/question_type_service.dart';
+import 'package:admin/services/survey_services.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:admin/models/question_model.dart';
@@ -13,42 +16,60 @@ class QuestionWidget extends StatefulWidget {
   _QuestionWidgetState createState() => _QuestionWidgetState();
 }
 
-List<QuestionType> list = List.generate(
-  QuestionTypeEnum.values.length,
-  (index) => QuestionType(
-    questionsTypeId: index + 1,
-    questionType: QuestionTypeEnum.values[index],
-    questions: [],
-  ),
-);
-
 class _QuestionWidgetState extends State<QuestionWidget> {
-  List<Answer>? pastAnswers;
-  List<Question>? pastQuestions;
-  var isLoaded = false;
-  getData() async {
-    pastAnswers = await RemoteService().getAnswer();
-    pastQuestions = await QuestionRemoteService().getQuestion();
-    print(pastQuestions![0].questionsTypeID.toString());
-    if (pastAnswers != null && pastQuestions != null) {
-      setState(() {
-        isLoaded = true;
-      });
-    }
-  }
-
   bool isMandatory = false;
-  QuestionType dropdownValue = list.first;
   DateTime? selectedDate;
   int _selectedValue = 1;
   int number = 1;
+  // late int urt;
+
   List<TextEditingController> _controllers = [];
   List<int> _values = [];
   List<bool> _isChecked = [];
   List<Widget> quests = [];
   final _questionController = TextEditingController();
+  final _textController = TextEditingController();
   String ques = '';
   List<Answer> answer = [];
+  var isLoaded = false;
+  List<QuestionType>? pastTypes;
+  List<Answer>? pastAnswers;
+  List<Question>? pastQuestions;
+  List<Survey>? pastSurveys;
+  List<String> list = [];
+  String? dropdownValue;
+  int urt = 0;
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+  // Asynchronous function to fetch data and update state
+  getData() async {
+    // Fetching data from remote services
+    pastTypes = await TypesRemoteService().getType();
+    pastAnswers = await RemoteService().getAnswer();
+    pastQuestions = await QuestionRemoteService().getQuestion();
+    pastSurveys = await SurveyRemoteService().getSurvey();
+
+    // Updating the state once data is fetched
+    setState(() {
+      // Mark data as loaded
+      isLoaded = true;
+      urt = pastSurveys!.length;
+      // Generate list of question types from pastTypes
+      list = List.generate(
+        pastTypes!.length,
+        (index) => pastTypes![index].questionType,
+      );
+
+      // Set dropdownValue to the first item in the list or null if the list is empty
+      dropdownValue = list.isNotEmpty ? list.first : null;
+    });
+  }
+
+// Initialize urt with the length of pastSurveys or 0 if pastSurveys is null
 
   void addOptions() {
     setState(() {
@@ -63,14 +84,14 @@ class _QuestionWidgetState extends State<QuestionWidget> {
     });
   }
 
-  Future<void> postQuestion(Question survey) async {
+  Future<void> postQuestion(Question question) async {
     final url = Uri.parse('http://localhost:3106/api/question');
     final response = await http.post(
       url,
       headers: {
         'Content-Type': 'application/json',
       },
-      body: json.encode(survey.toJson()),
+      body: json.encode(question.toJson()),
     );
 
     if (response.statusCode == 200) {
@@ -83,6 +104,8 @@ class _QuestionWidgetState extends State<QuestionWidget> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -92,6 +115,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
       ),
       child: Column(
         children: [
+          // Text(pastAnswers![0].answerText.toString()),
           Row(
             children: [
               Expanded(
@@ -125,18 +149,17 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: DropdownButton<QuestionType>(
+                child: DropdownButton<String>(
                   value: dropdownValue,
                   icon: const Icon(Icons.arrow_drop_down),
                   elevation: 16,
-                  items: list.map<DropdownMenuItem<QuestionType>>(
-                      (QuestionType value) {
-                    return DropdownMenuItem<QuestionType>(
+                  items: list.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value.toString()),
                     );
                   }).toList(),
-                  onChanged: (QuestionType? value) {
+                  onChanged: (String? value) {
                     setState(() {
                       dropdownValue = value!;
                     });
@@ -147,15 +170,14 @@ class _QuestionWidgetState extends State<QuestionWidget> {
           ),
           Column(
             children: List.generate(_controllers.length, (index) {
-              if (dropdownValue.questionType ==
-                  QuestionTypeEnum.MultipleChoice) {
+              if (dropdownValue == "Multiple Choice") {
                 return Container(
                   padding: EdgeInsets.all(8.0),
                   child: Row(
                     children: [
                       Checkbox(
                         value: _isChecked[index],
-                        activeColor: Colors.amber,
+                        activeColor: Colors.purple,
                         onChanged: (bool? value) {
                           setState(() {
                             _isChecked[index] = value!;
@@ -184,6 +206,42 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                           setState(() {
                             _controllers.removeAt(index);
                             _isChecked.removeAt(index);
+                            answer.removeAt(index);
+                          });
+                        },
+                        icon: Icon(Icons.cancel_outlined),
+                      ),
+                    ],
+                  ),
+                );
+              } else if (dropdownValue == "Text") {
+                return Container(
+                  padding: EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _textController,
+                          decoration: InputDecoration(
+                            hintText: "Hariult avah heseg",
+                            enabledBorder: InputBorder.none,
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              answer[index] = Answer(
+                                answersId: index + 1,
+                                questionsId: '',
+                                answerText: value,
+                              );
+                            });
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _controllers.removeAt(index);
+                            _values.removeAt(index);
                             answer.removeAt(index);
                           });
                         },
@@ -270,30 +328,92 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                         ],
                       ),
                     ),
-                    Container(
-                      child: Row(
-                        children: [
-                          Checkbox(
-                              value: isMandatory,
-                              onChanged: (value) {
-                                setState(() {
-                                  isMandatory = value!;
-                                });
-                              }),
-                          ElevatedButton(
+                    SizedBox(
+                      child: Container(
+                        child: Row(
+                          children: [
+                            Checkbox(
+                                value: isMandatory,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isMandatory = value!;
+                                  });
+                                }),
+                            ElevatedButton(
                               onPressed: () {
-                                final question = Question(
-                                  questionsID: 5,
-                                  questionsTypeID: "665e90a44026f697ef6234eb",
-                                  questionText: ques,
-                                  surveyID: "66612b52caf041775985b0ef",
-                                  isMandatory: isMandatory,
-                                  answers: [],
-                                );
-                                postQuestion(question);
+                                print(list);
+                                // print("asdasd");
+                                // print(pastQuestions![2].questionText); // print(pastQuestions?.length);
+                                switch (dropdownValue) {
+                                  case "Multiple Choice":
+                                    final question = Question(
+                                      questionsID: pastQuestions?.length ?? 0,
+                                      questionsTypeID:
+                                          "668b5ee28fe4ad9832cda5c4",
+                                      questionText: ques,
+                                      surveyID: "",
+
+                                      isMandatory: isMandatory,
+                                      // answers: [],
+                                    );
+                                    postQuestion(question);
+                                    break;
+                                  case "Single Choice":
+                                    final question = Question(
+                                      questionsID: pastQuestions?.length ?? 0,
+                                      questionsTypeID:
+                                          "668b5ec48fe4ad9832cda5c2",
+                                      questionText: ques,
+                                      surveyID: "66612b52caf041775985b0ef",
+                                      isMandatory: isMandatory,
+                                      // answers: [],
+                                    );
+                                    postQuestion(question);
+                                    break;
+                                  case "Text":
+                                    final question = Question(
+                                      questionsID: pastQuestions?.length ?? 0,
+                                      questionsTypeID:
+                                          "66615953779fe29889d1d075",
+                                      questionText: ques,
+                                      surveyID: "66612b52caf041775985b0ef",
+                                      isMandatory: isMandatory,
+                                      // answers: [],
+                                    );
+                                    postQuestion(question);
+                                    break;
+                                  case "Numeric":
+                                    final question = Question(
+                                      questionsID: pastQuestions?.length ?? 0,
+                                      questionsTypeID:
+                                          "665e90a44026f697ef6234eb",
+                                      questionText: ques,
+                                      surveyID: "66612b52caf041775985b0ef",
+                                      isMandatory: isMandatory,
+                                      // answers: [],
+                                    );
+                                    postQuestion(question);
+                                    break;
+                                  case "Numeric":
+                                    final question = Question(
+                                      questionsID: pastQuestions?.length ?? 0,
+                                      questionsTypeID:
+                                          "665e90954026f697ef6234e9",
+                                      questionText: ques,
+                                      surveyID: "66612b52caf041775985b0ef",
+                                      isMandatory: isMandatory,
+                                      // answers: [],
+                                    );
+                                    postQuestion(question);
+                                    break;
+                                }
                               },
-                              child: Text("Save")),
-                        ],
+                              child: Text(
+                                "Save",
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

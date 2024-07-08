@@ -9,7 +9,6 @@ class Survey {
   String surveyDescription;
   DateTime surveyStartDate;
   DateTime surveyEndDate;
-  // List<Question> questions;
   Survey({
     required this.surveyId,
     required this.surveyStatus,

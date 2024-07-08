@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 class SurveyRemoteService {
   Future<List<Survey>?> getSurvey() async {
     var clients = http.Client();
-    var uris = Uri.parse('http://10.0.2.2:3106/api/survey');
+    var uris = Uri.parse('http://localhost:3106/api/survey');
     try {
       var response = await clients.get(uris);
       if (response.statusCode == 200) {
