@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:admin/models/answer_model.dart';
-import 'package:admin/models/question_model.dart';
-import 'package:admin/models/question_type_model.dart';
-import 'package:admin/services/answer_service.dart';
-import 'package:admin/services/question_service.dart';
+// import 'package:admin/models/answer_model.dart';
+// import 'package:admin/models/question_model.dart';
+// import 'package:admin/models/question_type_model.dart';
+// import 'package:admin/services/answer_service.dart';
+// import 'package:admin/services/question_service.dart';
 import 'package:admin/services/survey_services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -108,28 +108,60 @@ class _AdminDashState extends State<AdminDash> {
 
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 105, 4, 114),
-        title: const Text(
-          "Admin Dashboard",
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
+          // centerTitle: true,
+          backgroundColor: const Color(0xff333541),
+          title: const Text(
+            "Admin Dashboard",
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: <Widget>[
+            Placeholder(
+              fallbackHeight: 30,
+              fallbackWidth: 100,
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Placeholder(
+              fallbackHeight: 30,
+              fallbackWidth: 100,
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Padding(
+              padding: EdgeInsets.only(right: 20),
+              child: Container(
+                color: Color(0xff8146f6),
+                child: IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: () {},
+                  color: Colors.white,
+                ),
+              ),
+            )
+          ]),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Padding(
-            padding: EdgeInsets.symmetric(
-                vertical: height * 0.02, horizontal: width * 0.3),
+            padding: EdgeInsets.all(10),
+            // padding: EdgeInsets.symmetric(
+            //     vertical: height * 0.02, horizontal: width * 0.3),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  "Create Survey",
+                  style: TextStyle(fontSize: 24),
+                ),
                 //Text(pastSurveys![0].surveyDescription),
                 Container(
-                  padding: const EdgeInsets.all(15),
+                  padding: EdgeInsets.only(right: width * 0.5, top: 20),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(),
+                    // border: Border.all(),
                   ),
                   child: Column(
                     children: [
@@ -215,75 +247,64 @@ class _AdminDashState extends State<AdminDash> {
                         validator: (date) =>
                             date!.isEmpty ? "End date is required" : null,
                       ),
+                      SizedBox(
+                        height: height * 0.035,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                bool isActive = selectedEndDate != null &&
+                                    selectedEndDate!.isAfter(DateTime.now());
+                                if (selectedStartDate != null &&
+                                    selectedEndDate != null) {
+                                  final survey = Survey(
+                                    surveyId: pastSurveys?.length ??
+                                        0, // ajillahgu bgaa
+                                    surveyStatus: isActive,
+                                    surveyName: sName,
+                                    surveyDescription: sDesc,
+                                    surveyStartDate: selectedStartDate!,
+                                    surveyEndDate: selectedEndDate!,
+                                    // questions: [],
+                                  );
+
+                                  postSurvey(survey);
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              QuestionWidget()));
+                                } else {
+                                  print('Start and end dates are required');
+                                }
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xff15ae5c),
+                            ),
+                            child: const Text(
+                              "Create Survey",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: height * 0.01,
+                      )
                     ],
                   ),
                 ),
                 const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          bool isActive = selectedEndDate != null &&
-                              selectedEndDate!.isAfter(DateTime.now());
-                          if (selectedStartDate != null &&
-                              selectedEndDate != null) {
-                            final survey = Survey(
-                              surveyId:
-                                  pastSurveys?.length ?? 0, // ajillahgu bgaa
-                              surveyStatus: isActive,
-                              surveyName: sName,
-                              surveyDescription: sDesc,
-                              surveyStartDate: selectedStartDate!,
-                              surveyEndDate: selectedEndDate!,
-                              // questions: [],
-                            );
 
-                            postSurvey(survey);
-                          } else {
-                            print('Start and end dates are required');
-                          }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 105, 4, 114),
-                      ),
-                      child: const Text(
-                        "Save",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
                 const SizedBox(height: 20),
-
-                if (pastSurveys != null)
-                  // Text('Number of past surveys: ${pastSurveys!.length}'),
-                  ListView.separated(
-                    shrinkWrap: true,
-                    itemBuilder: (BuildContext context, int index) {
-                      return quests[index];
-                    },
-                    separatorBuilder: (BuildContext context, int index) =>
-                        const SizedBox(
-                      height: 10,
-                    ),
-                    itemCount: quests.length,
-                  ),
               ],
             ),
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            quests.add(QuestionWidget());
-          });
-        },
-        child: const Icon(Icons.add),
-        tooltip: "Add questions",
       ),
     );
   }

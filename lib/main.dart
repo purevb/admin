@@ -1,4 +1,5 @@
 import 'package:admin/admin.dart';
+import 'package:admin/question.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,9 +13,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: new ThemeData(scaffoldBackgroundColor: const Color(0xFFf0eaf9)),
+      theme: new ThemeData(scaffoldBackgroundColor: const Color(0xFFf9f9fb)),
       debugShowCheckedModeBanner: false,
-      home: AdminDash(),
+      // home: AdminDash(),
+      home: QuestionWidget(),
     );
   }
 }
