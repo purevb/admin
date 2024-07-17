@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(scaffoldBackgroundColor: const Color(0xFFf9f9fb)),
       debugShowCheckedModeBanner: false,
       // home: AdminDash(),
-      home: QuestionWidget(),
+      home: AdminDash(),
     );
   }
 }

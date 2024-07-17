@@ -30,10 +30,10 @@ class _QuestWidgetState extends State<QuestWidget> {
   final _questionController = TextEditingController();
   final _textController = TextEditingController();
   String ques = '';
-  List<Answer> answer = [];
+  // List<Answer> answer = [];/
   var isLoaded = false;
   List<QuestionType>? pastTypes;
-  List<Answer>? pastAnswers;
+  // List<Answer>? pastAnswers;
   List<Question>? pastQuestions;
   List<Survey>? pastSurveys;
   List<String> list = [];
@@ -45,41 +45,33 @@ class _QuestWidgetState extends State<QuestWidget> {
     getData();
   }
 
-  // Asynchronous function to fetch data and update state
   getData() async {
-    // Fetching data from remote services
     pastTypes = await TypesRemoteService().getType();
-    pastAnswers = await RemoteService().getAnswer();
+    // pastAnswers = await RemoteService().getAnswer();
     pastQuestions = await QuestionRemoteService().getQuestion();
     pastSurveys = await SurveyRemoteService().getSurvey();
 
-    // Updating the state once data is fetched
     setState(() {
-      // Mark data as loaded
       isLoaded = true;
       urt = pastSurveys!.length;
-      // Generate list of question types from pastTypes
       list = List.generate(
         pastTypes!.length,
         (index) => pastTypes![index].questionType,
       );
 
-      // Set dropdownValue to the first item in the list or null if the list is empty
       dropdownValue = list.isNotEmpty ? list.first : null;
     });
   }
-
-// Initialize urt with the length of pastSurveys or 0 if pastSurveys is null
 
   void addOptions() {
     setState(() {
       _controllers.add(TextEditingController(text: "Option $number"));
       _isChecked.add(false);
       _values.add(_values.length + 1);
-      answer.add(Answer(
-          answersId: _values.length,
-          questionsId: '',
-          answerText: "Option $number"));
+      // answer.add(Answer(
+      //     answersId: _values.length,
+      //     questionsId: '',
+      //     answerText: "Option $number"));
       number++;
     });
   }
@@ -192,11 +184,11 @@ class _QuestWidgetState extends State<QuestWidget> {
                           ),
                           onChanged: (value) {
                             setState(() {
-                              answer[index] = Answer(
-                                answersId: index + 1,
-                                questionsId: '',
-                                answerText: value,
-                              );
+                              // answer[index] = Answer(
+                              //   answersId: index + 1,
+                              //   questionsId: '',
+                              //   answerText: value,
+                              // );
                             });
                           },
                         ),
@@ -206,7 +198,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                           setState(() {
                             _controllers.removeAt(index);
                             _isChecked.removeAt(index);
-                            answer.removeAt(index);
+                            // answer.removeAt(index);
                           });
                         },
                         icon: Icon(Icons.cancel_outlined),
@@ -228,11 +220,11 @@ class _QuestWidgetState extends State<QuestWidget> {
                           ),
                           onChanged: (value) {
                             setState(() {
-                              answer[index] = Answer(
-                                answersId: index + 1,
-                                questionsId: '',
-                                answerText: value,
-                              );
+                              // answer[index] = Answer(
+                              //   answersId: index + 1,
+                              //   questionsId: '',
+                              //   answerText: value,
+                              // );
                             });
                           },
                         ),
@@ -242,7 +234,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                           setState(() {
                             _controllers.removeAt(index);
                             _values.removeAt(index);
-                            answer.removeAt(index);
+                            // answer.removeAt(index);
                           });
                         },
                         icon: Icon(Icons.cancel_outlined),
@@ -272,11 +264,11 @@ class _QuestWidgetState extends State<QuestWidget> {
                           ),
                           onChanged: (value) {
                             setState(() {
-                              answer[index] = Answer(
-                                answersId: index + 1,
-                                questionsId: '',
-                                answerText: value,
-                              );
+                              // answer[index] = Answer(
+                              //   answersId: index + 1,
+                              //   questionsId: '',
+                              //   answerText: value,
+                              // );
                             });
                           },
                         ),
@@ -286,7 +278,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                           setState(() {
                             _controllers.removeAt(index);
                             _values.removeAt(index);
-                            answer.removeAt(index);
+                            // answer.removeAt(index);
                           });
                         },
                         icon: Icon(Icons.cancel_outlined),
@@ -341,7 +333,6 @@ class _QuestWidgetState extends State<QuestWidget> {
                                 }),
                             ElevatedButton(
                               onPressed: () {
-                                print(list);
                                 // print("asdasd");
                                 // print(pastQuestions![2].questionText); // print(pastQuestions?.length);
                                 switch (dropdownValue) {
@@ -351,9 +342,8 @@ class _QuestWidgetState extends State<QuestWidget> {
                                       questionsTypeID:
                                           "668b5ee28fe4ad9832cda5c4",
                                       questionText: ques,
-                                      surveyID: "",
 
-                                      isMandatory: isMandatory,
+                                      isMandatory: isMandatory, answers: [],
                                       // answers: [],
                                     );
                                     postQuestion(question);
@@ -364,8 +354,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                                       questionsTypeID:
                                           "668b5ec48fe4ad9832cda5c2",
                                       questionText: ques,
-                                      surveyID: "66612b52caf041775985b0ef",
-                                      isMandatory: isMandatory,
+                                      isMandatory: isMandatory, answers: [],
                                       // answers: [],
                                     );
                                     postQuestion(question);
@@ -376,8 +365,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                                       questionsTypeID:
                                           "66615953779fe29889d1d075",
                                       questionText: ques,
-                                      surveyID: "66612b52caf041775985b0ef",
-                                      isMandatory: isMandatory,
+                                      isMandatory: isMandatory, answers: [],
                                       // answers: [],
                                     );
                                     postQuestion(question);
@@ -388,8 +376,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                                       questionsTypeID:
                                           "665e90a44026f697ef6234eb",
                                       questionText: ques,
-                                      surveyID: "66612b52caf041775985b0ef",
-                                      isMandatory: isMandatory,
+                                      isMandatory: isMandatory, answers: [],
                                       // answers: [],
                                     );
                                     postQuestion(question);
@@ -400,8 +387,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                                       questionsTypeID:
                                           "665e90954026f697ef6234e9",
                                       questionText: ques,
-                                      surveyID: "66612b52caf041775985b0ef",
-                                      isMandatory: isMandatory,
+                                      isMandatory: isMandatory, answers: [],
                                       // answers: [],
                                     );
                                     postQuestion(question);

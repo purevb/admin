@@ -268,6 +268,7 @@ class _AdminDashState extends State<AdminDash> {
                                     surveyDescription: sDesc,
                                     surveyStartDate: selectedStartDate!,
                                     surveyEndDate: selectedEndDate!,
+                                    questions: [],
                                     // questions: [],
                                   );
 

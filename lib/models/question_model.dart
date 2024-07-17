@@ -1,29 +1,53 @@
 import 'dart:convert';
 
-import 'package:admin/models/question_type_model.dart';
+class Answer {
+  final int answersID;
+  final String answerText;
+
+  Answer({
+    required this.answersID,
+    required this.answerText,
+  });
+
+  factory Answer.fromJson(Map<String, dynamic> json) {
+    return Answer(
+      answersID: json['answers_id'],
+      answerText: json['answer_text'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        "answers_id": answersID,
+        "answer_text": answerText,
+      };
+}
 
 class Question {
   final int questionsID;
   final String questionsTypeID;
   final String questionText;
-  final String surveyID;
+  final List<Answer>? answers;
   final bool isMandatory;
 
   Question({
     required this.questionsID,
     required this.questionsTypeID,
     required this.questionText,
-    required this.surveyID,
+    required this.answers,
     required this.isMandatory,
   });
 
   factory Question.fromJson(Map<String, dynamic> json) {
+    var answersFromJson = json['answers'] as List;
+    List<Answer> answersList =
+        answersFromJson.map((answer) => Answer.fromJson(answer)).toList();
+
     return Question(
       questionsID: json['questions_id'],
       questionsTypeID: json['questions_type_id'],
-      questionText: json['question_text'] as String,
-      surveyID: json['survey_id'] as String,
-      isMandatory: json['is_Mandatory'] as bool,
+      questionText: json['question_text'],
+      answers: answersList,
+      isMandatory: json['is_Mandatory'],
     );
   }
 
@@ -31,7 +55,9 @@ class Question {
         "questions_id": questionsID,
         "questions_type_id": questionsTypeID,
         "question_text": questionText,
-        "survey_id": surveyID,
+        "answers": answers != null
+            ? List<dynamic>.from(answers!.map((x) => x.toJson()))
+            : null,
         "is_Mandatory": isMandatory,
       };
 }

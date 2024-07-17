@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:admin/models/survey_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -9,7 +11,7 @@ class SurveyRemoteService {
       var response = await clients.get(uris);
       if (response.statusCode == 200) {
         var json = response.body;
-        return postFromJson(json);
+        return surveyFromJson(json);
       } else {
         print('Server error: ${response.statusCode}');
       }

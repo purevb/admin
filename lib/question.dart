@@ -35,10 +35,10 @@ class _QuestionWidgetState extends State<QuestionWidget> {
   final _questionController = TextEditingController();
   final _textController = TextEditingController();
   String ques = '';
-  List<Answer> answer = [];
+  // List<Answer> answer = [];
   var isLoaded = false;
   List<QuestionType>? pastTypes;
-  List<Answer>? pastAnswers;
+  // List<Answer>? pastAnswers;
   List<Question>? pastQuestions;
   List<Survey>? pastSurveys;
   List<String> list = [];
@@ -52,7 +52,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
 
   getData() async {
     pastTypes = await TypesRemoteService().getType();
-    pastAnswers = await RemoteService().getAnswer();
+    // pastAnswers = await RemoteService().getAnswer();
     pastQuestions = await QuestionRemoteService().getQuestion();
     pastSurveys = await SurveyRemoteService().getSurvey();
 
@@ -73,10 +73,10 @@ class _QuestionWidgetState extends State<QuestionWidget> {
       _controllers.add(TextEditingController(text: "Option $number"));
       _isChecked.add(false);
       _values.add(_values.length + 1);
-      answer.add(Answer(
-          answersId: _values.length,
-          questionsId: '',
-          answerText: "Option $number"));
+      // answer.add(Answer(
+      //     answersId: _values.length,
+      //     questionsId: '',
+      //     answerText: "Option $number"));
       number++;
     });
   }

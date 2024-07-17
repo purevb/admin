@@ -9,6 +9,8 @@ class Survey {
   String surveyDescription;
   DateTime surveyStartDate;
   DateTime surveyEndDate;
+  List<Question> questions;
+
   Survey({
     required this.surveyId,
     required this.surveyStatus,
@@ -16,7 +18,7 @@ class Survey {
     required this.surveyDescription,
     required this.surveyStartDate,
     required this.surveyEndDate,
-    // required this.questions,
+    required this.questions,
   });
 
   factory Survey.fromJson(Map<String, dynamic> json) {
@@ -26,10 +28,12 @@ class Survey {
       surveyName: json['survey_name'],
       surveyDescription: json['survey_description'],
       surveyStartDate: DateTime.parse(json['survey_start_date']),
-      surveyEndDate: DateTime.parse(json['survey_end_date']),
-      // questions: (json['questions'] as List<dynamic>)
-      //     // .map((questionJson) => Question.fromJson(questionJson))
-      //     // .toList(),
+      surveyEndDate: json['survey_end_date'] != null
+          ? DateTime.parse(json['survey_end_date'])
+          : DateTime.now(),
+      questions: (json['questions'] as List<dynamic>)
+          .map((questionJson) => Question.fromJson(questionJson))
+          .toList(),
     );
   }
 
@@ -41,15 +45,15 @@ class Survey {
       'survey_description': surveyDescription,
       'survey_start_date': surveyStartDate.toIso8601String(),
       'survey_end_date': surveyEndDate.toIso8601String(),
-      // 'questions': questions.map((question) => question.toJson()).toList(),
+      'questions': questions.map((question) => question.toJson()).toList(),
     };
   }
 }
 
-List<Survey> postFromJson(String str) {
+List<Survey> surveyFromJson(String str) {
   final jsonData = json.decode(str);
   return List<Survey>.from(jsonData["surveys"].map((x) => Survey.fromJson(x)));
 }
 
-String postToJson(List<Survey> data) =>
+String surveyToJson(List<Survey> data) =>
     json.encode({"surveys": List<dynamic>.from(data.map((x) => x.toJson()))});
