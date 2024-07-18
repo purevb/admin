@@ -1,66 +1,68 @@
 import 'dart:convert';
-import 'package:admin/models/answer_model.dart';
 import 'package:admin/models/survey_model.dart';
-import 'package:admin/services/answer_service.dart';
 import 'package:admin/services/question_service.dart';
 import 'package:admin/services/question_type_service.dart';
 import 'package:admin/services/survey_services.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:admin/models/question_model.dart';
 import 'package:admin/models/question_type_model.dart';
 import 'package:flutter/material.dart';
 
 class QuestWidget extends StatefulWidget {
+  QuestWidget({super.key});
   @override
   _QuestWidgetState createState() => _QuestWidgetState();
 }
 
 class _QuestWidgetState extends State<QuestWidget> {
   bool isMandatory = false;
-  DateTime? selectedDate;
   int _selectedValue = 1;
   int number = 1;
-  // late int urt;
-
-  List<TextEditingController> _controllers = [];
-  List<int> _values = [];
-  List<bool> _isChecked = [];
+  final List<TextEditingController> _controllers = [];
+  final List<int> _values = [];
+  final List<bool> _isChecked = [];
   List<Widget> quests = [];
   final _questionController = TextEditingController();
   final _textController = TextEditingController();
   String ques = '';
-  // List<Answer> answer = [];/
+  List<String> ans = [];
   var isLoaded = false;
   List<QuestionType>? pastTypes;
-  // List<Answer>? pastAnswers;
   List<Question>? pastQuestions;
   List<Survey>? pastSurveys;
   List<String> list = [];
   String? dropdownValue;
   int urt = 0;
+
   @override
   void initState() {
     super.initState();
     getData();
   }
 
-  getData() async {
-    pastTypes = await TypesRemoteService().getType();
-    // pastAnswers = await RemoteService().getAnswer();
-    pastQuestions = await QuestionRemoteService().getQuestion();
-    pastSurveys = await SurveyRemoteService().getSurvey();
-
-    setState(() {
-      isLoaded = true;
-      urt = pastSurveys!.length;
-      list = List.generate(
-        pastTypes!.length,
-        (index) => pastTypes![index].questionType,
-      );
-
-      dropdownValue = list.isNotEmpty ? list.first : null;
-    });
+  Future<void> getData() async {
+    try {
+      pastTypes = await TypesRemoteService().getType();
+      pastQuestions = await QuestionRemoteService().getQuestion();
+      pastSurveys = await SurveyRemoteService().getSurvey();
+      setState(() {
+        isLoaded = true;
+        if (pastTypes != null && pastTypes!.isNotEmpty) {
+          list = List.generate(
+            pastTypes!.length,
+            (index) => pastTypes![index].questionType,
+          );
+          dropdownValue = list.isNotEmpty ? list.first : null;
+        } else {
+          dropdownValue = null;
+        }
+      });
+    } catch (e) {
+      print('Error fetching data: $e');
+      setState(() {
+        isLoaded = false;
+      });
+    }
   }
 
   void addOptions() {
@@ -68,10 +70,7 @@ class _QuestWidgetState extends State<QuestWidget> {
       _controllers.add(TextEditingController(text: "Option $number"));
       _isChecked.add(false);
       _values.add(_values.length + 1);
-      // answer.add(Answer(
-      //     answersId: _values.length,
-      //     questionsId: '',
-      //     answerText: "Option $number"));
+      ans.add("");
       number++;
     });
   }
@@ -87,7 +86,7 @@ class _QuestWidgetState extends State<QuestWidget> {
     );
 
     if (response.statusCode == 200) {
-      print('question saved successfully');
+      print('Question saved successfully');
     } else {
       print('Failed to save question');
       print(response.body);
@@ -107,7 +106,6 @@ class _QuestWidgetState extends State<QuestWidget> {
       ),
       child: Column(
         children: [
-          // Text(pastAnswers![0].answerText.toString()),
           Row(
             children: [
               Expanded(
@@ -115,7 +113,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                   color: Colors.grey.withOpacity(0.08),
                   child: TextFormField(
                     controller: _questionController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       contentPadding: EdgeInsets.only(left: 10),
                       labelText: "Асуулт",
                       labelStyle: TextStyle(color: Colors.grey),
@@ -130,13 +128,13 @@ class _QuestWidgetState extends State<QuestWidget> {
               ),
               IconButton(
                 onPressed: () {},
-                icon: Icon(
+                icon: const Icon(
                   Icons.image_outlined,
                   size: 30,
                 ),
               ),
               Container(
-                padding: EdgeInsets.only(left: 5, right: 5),
+                padding: const EdgeInsets.only(left: 5, right: 5),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(8),
@@ -164,7 +162,7 @@ class _QuestWidgetState extends State<QuestWidget> {
             children: List.generate(_controllers.length, (index) {
               if (dropdownValue == "Multiple Choice") {
                 return Container(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
                       Checkbox(
@@ -179,16 +177,12 @@ class _QuestWidgetState extends State<QuestWidget> {
                       Expanded(
                         child: TextField(
                           controller: _controllers[index],
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             enabledBorder: InputBorder.none,
                           ),
                           onChanged: (value) {
                             setState(() {
-                              // answer[index] = Answer(
-                              //   answersId: index + 1,
-                              //   questionsId: '',
-                              //   answerText: value,
-                              // );
+                              ans[index] = value;
                             });
                           },
                         ),
@@ -198,10 +192,11 @@ class _QuestWidgetState extends State<QuestWidget> {
                           setState(() {
                             _controllers.removeAt(index);
                             _isChecked.removeAt(index);
-                            // answer.removeAt(index);
+                            _values.removeAt(index);
+                            ans.removeAt(index);
                           });
                         },
-                        icon: Icon(Icons.cancel_outlined),
+                        icon: const Icon(Icons.cancel_outlined),
                       ),
                     ],
                   ),
@@ -214,17 +209,17 @@ class _QuestWidgetState extends State<QuestWidget> {
                       Expanded(
                         child: TextField(
                           controller: _textController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             hintText: "Hariult avah heseg",
                             enabledBorder: InputBorder.none,
                           ),
                           onChanged: (value) {
                             setState(() {
-                              // answer[index] = Answer(
-                              //   answersId: index + 1,
-                              //   questionsId: '',
-                              //   answerText: value,
-                              // );
+                              if (index < ans.length) {
+                                ans[index] = value;
+                              } else {
+                                ans.add(value);
+                              }
                             });
                           },
                         ),
@@ -234,17 +229,17 @@ class _QuestWidgetState extends State<QuestWidget> {
                           setState(() {
                             _controllers.removeAt(index);
                             _values.removeAt(index);
-                            // answer.removeAt(index);
+                            ans.removeAt(index);
                           });
                         },
-                        icon: Icon(Icons.cancel_outlined),
+                        icon: const Icon(Icons.cancel_outlined),
                       ),
                     ],
                   ),
                 );
               } else {
                 return Container(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
                       Radio(
@@ -259,16 +254,12 @@ class _QuestWidgetState extends State<QuestWidget> {
                       Expanded(
                         child: TextField(
                           controller: _controllers[index],
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             enabledBorder: InputBorder.none,
                           ),
                           onChanged: (value) {
                             setState(() {
-                              // answer[index] = Answer(
-                              //   answersId: index + 1,
-                              //   questionsId: '',
-                              //   answerText: value,
-                              // );
+                              ans[index] = value;
                             });
                           },
                         ),
@@ -278,10 +269,10 @@ class _QuestWidgetState extends State<QuestWidget> {
                           setState(() {
                             _controllers.removeAt(index);
                             _values.removeAt(index);
-                            // answer.removeAt(index);
+                            ans.removeAt(index);
                           });
                         },
-                        icon: Icon(Icons.cancel_outlined),
+                        icon: const Icon(Icons.cancel_outlined),
                       ),
                     ],
                   ),
@@ -292,7 +283,7 @@ class _QuestWidgetState extends State<QuestWidget> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: InkWell(
                 onTap: addOptions,
                 child: Row(
@@ -310,7 +301,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                               });
                             },
                           ),
-                          Text(
+                          const Text(
                             "Add option",
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
@@ -320,93 +311,116 @@ class _QuestWidgetState extends State<QuestWidget> {
                         ],
                       ),
                     ),
-                    SizedBox(
-                      child: Container(
-                        child: Row(
-                          children: [
-                            Checkbox(
-                                value: isMandatory,
-                                onChanged: (value) {
-                                  setState(() {
-                                    isMandatory = value!;
-                                  });
-                                }),
-                            ElevatedButton(
-                              onPressed: () {
-                                // print("asdasd");
-                                // print(pastQuestions![2].questionText); // print(pastQuestions?.length);
-                                switch (dropdownValue) {
-                                  case "Multiple Choice":
-                                    final question = Question(
-                                      questionsID: pastQuestions?.length ?? 0,
-                                      questionsTypeID:
-                                          "668b5ee28fe4ad9832cda5c4",
-                                      questionText: ques,
-
-                                      isMandatory: isMandatory, answers: [],
-                                      // answers: [],
-                                    );
-                                    postQuestion(question);
-                                    break;
-                                  case "Single Choice":
-                                    final question = Question(
-                                      questionsID: pastQuestions?.length ?? 0,
-                                      questionsTypeID:
-                                          "668b5ec48fe4ad9832cda5c2",
-                                      questionText: ques,
-                                      isMandatory: isMandatory, answers: [],
-                                      // answers: [],
-                                    );
-                                    postQuestion(question);
-                                    break;
-                                  case "Text":
-                                    final question = Question(
-                                      questionsID: pastQuestions?.length ?? 0,
-                                      questionsTypeID:
-                                          "66615953779fe29889d1d075",
-                                      questionText: ques,
-                                      isMandatory: isMandatory, answers: [],
-                                      // answers: [],
-                                    );
-                                    postQuestion(question);
-                                    break;
-                                  case "Numeric":
-                                    final question = Question(
-                                      questionsID: pastQuestions?.length ?? 0,
-                                      questionsTypeID:
-                                          "665e90a44026f697ef6234eb",
-                                      questionText: ques,
-                                      isMandatory: isMandatory, answers: [],
-                                      // answers: [],
-                                    );
-                                    postQuestion(question);
-                                    break;
-                                  case "Numeric":
-                                    final question = Question(
-                                      questionsID: pastQuestions?.length ?? 0,
-                                      questionsTypeID:
-                                          "665e90954026f697ef6234e9",
-                                      questionText: ques,
-                                      isMandatory: isMandatory, answers: [],
-                                      // answers: [],
-                                    );
-                                    postQuestion(question);
-                                    break;
-                                }
-                              },
-                              child: Text(
-                                "Save",
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
             ),
           ),
+          Divider(height: 25),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Row(
+                children: [
+                  IconButton(onPressed: () {}, icon: Icon(Icons.copy_rounded)),
+                  IconButton(
+                      onPressed: () {}, icon: Icon(Icons.delete_outline)),
+                ],
+              ),
+              VerticalDivider(
+                thickness: 5,
+              ),
+              SizedBox(
+                child: Container(
+                  child: Row(
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            "Required",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Checkbox(
+                              value: isMandatory,
+                              onChanged: (value) {
+                                setState(() {
+                                  isMandatory = value!;
+                                });
+                              }),
+                        ],
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          print(ans);
+                          Question question;
+                          List<Answer> answers =
+                              ans.map((e) => Answer(answerText: e)).toList();
+                          switch (dropdownValue) {
+                            case "Multiple Choice":
+                              question = Question(
+                                questionsID: pastQuestions?.length ?? 0,
+                                questionsTypeID: "669763b497492aac645169c1",
+                                questionText: ques,
+                                isMandatory: isMandatory,
+                                answers: answers,
+                              );
+                              break;
+                            case "Single Choice":
+                              question = Question(
+                                questionsID: pastQuestions?.length ?? 0,
+                                questionsTypeID: "669763a597492aac645169bfc",
+                                questionText: ques,
+                                isMandatory: isMandatory,
+                                answers: answers,
+                              );
+                              break;
+                            case "Text":
+                              question = Question(
+                                questionsID: pastQuestions?.length ?? 0,
+                                questionsTypeID: "6697639a97492aac645169bd",
+                                questionText: ques,
+                                isMandatory: isMandatory,
+                                answers: answers,
+                              );
+                              break;
+                            case "Numeric":
+                              question = Question(
+                                questionsID: pastQuestions?.length ?? 0,
+                                questionsTypeID: "6697638f97492aac645169bb",
+                                questionText: ques,
+                                isMandatory: isMandatory,
+                                answers: answers,
+                              );
+                              break;
+                            case "Logical":
+                              question = Question(
+                                questionsID: pastQuestions?.length ?? 0,
+                                questionsTypeID: "669763c097492aac645169c3",
+                                questionText: ques,
+                                isMandatory: isMandatory,
+                                answers: answers,
+                              );
+                              break;
+                            default:
+                              return;
+                          }
+
+                          postQuestion(question);
+                        },
+                        child: const Text("Save"),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black.withOpacity(0.5),
+                            foregroundColor: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );

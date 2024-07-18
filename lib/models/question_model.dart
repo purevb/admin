@@ -1,23 +1,19 @@
 import 'dart:convert';
 
 class Answer {
-  final int answersID;
   final String answerText;
 
   Answer({
-    required this.answersID,
     required this.answerText,
   });
 
   factory Answer.fromJson(Map<String, dynamic> json) {
     return Answer(
-      answersID: json['answers_id'],
       answerText: json['answer_text'],
     );
   }
 
   Map<String, dynamic> toJson() => {
-        "answers_id": answersID,
         "answer_text": answerText,
       };
 }
