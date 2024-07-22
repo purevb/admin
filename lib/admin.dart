@@ -1,9 +1,4 @@
 import 'dart:convert';
-// import 'package:admin/models/answer_model.dart';
-// import 'package:admin/models/question_model.dart';
-// import 'package:admin/models/question_type_model.dart';
-// import 'package:admin/services/answer_service.dart';
-// import 'package:admin/services/question_service.dart';
 import 'package:admin/services/survey_services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -14,90 +9,67 @@ final _formKey = GlobalKey<FormState>();
 
 class AdminDash extends StatefulWidget {
   const AdminDash({super.key});
-
   @override
   State<AdminDash> createState() => _AdminDashState();
 }
-
-// List<QuestionType> list = List.generate(
-//   QuestionTypeEnum.values.length - 2,
-//   (index) => QuestionType(
-//     questionsTypeId: index + 1,
-//     questionType: QuestionTypeEnum.values[index],
-//     questions: [],
-//   ),
-// );
 
 class _AdminDashState extends State<AdminDash> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _startDateController = TextEditingController();
   final _endDateController = TextEditingController();
-
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
   int number = 1;
   List<TextEditingController> _controllers = [];
-  // List<int> _values = [];
-  // List<bool> _isChecked = [];
   List<Widget> quests = [];
   bool active = false;
   String sName = '';
-
   String sDesc = '';
   String sDate = '';
   String eDate = '';
-
   @override
   void initState() {
     super.initState();
     _controllers.add(TextEditingController(text: "Option $number"));
-    // _values.add(0);
-    // _isChecked = List<bool>.filled(number, false);
     getData();
   }
 
-  // List<Answer>? pastAnswers;
-  // List<Question>? pastQuestions;
   List<Survey>? pastSurveys;
   var isLoaded = false;
-  getData() async {
-    // pastAnswers = await RemoteService().getAnswer();
-    // pastQuestions = await QuestionRemoteService().getQuestion();
+  Future<void> getData() async {
     pastSurveys = await SurveyRemoteService().getSurvey();
-    // print(pastQuestions![0].questionsTypeID.toString());
-    if (pastSurveys != null) {
+    if (pastSurveys != null && pastSurveys!.isNotEmpty) {
       setState(() {
         isLoaded = true;
       });
     }
   }
 
-  // List.generate(Question, (index) => null)
   void addOptions() {
     setState(() {
       number++;
       _controllers.add(TextEditingController(text: "Option $number"));
-      // _values.add(number);
-      // _isChecked = List<bool>.filled(number, false);
     });
   }
 
-  Future<void> postSurvey(Survey survey) async {
+  Future<dynamic> postSurvey(Survey survey) async {
     final url = Uri.parse('http://localhost:3106/api/survey');
+    final surveyJson = json.encode(survey.toJson());
+    print('Survey JSON: $surveyJson'); // Print survey data
     final response = await http.post(
       url,
       headers: {
         'Content-Type': 'application/json',
       },
-      body: json.encode(survey.toJson()),
+      body: surveyJson,
     );
 
-    if (response.statusCode == 200) {
-      print('Survey saved successfully');
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final responseData = json.decode(response.body);
+      return responseData;
     } else {
-      print('Failed to save survey');
-      print(response.body);
+      return null;
     }
   }
 
@@ -105,10 +77,8 @@ class _AdminDashState extends State<AdminDash> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: AppBar(
-          // centerTitle: true,
           backgroundColor: const Color(0xff333541),
           title: const Text(
             "Admin Dashboard",
@@ -146,8 +116,6 @@ class _AdminDashState extends State<AdminDash> {
           key: _formKey,
           child: Padding(
             padding: EdgeInsets.all(10),
-            // padding: EdgeInsets.symmetric(
-            //     vertical: height * 0.02, horizontal: width * 0.3),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -155,13 +123,11 @@ class _AdminDashState extends State<AdminDash> {
                   "Create Survey",
                   style: TextStyle(fontSize: 24),
                 ),
-                //Text(pastSurveys![0].surveyDescription),
                 Container(
                   padding: EdgeInsets.only(right: width * 0.5, top: 20),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
-                    // border: Border.all(),
                   ),
                   child: Column(
                     children: [
@@ -254,30 +220,34 @@ class _AdminDashState extends State<AdminDash> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
                               if (_formKey.currentState!.validate()) {
                                 bool isActive = selectedEndDate != null &&
                                     selectedEndDate!.isAfter(DateTime.now());
                                 if (selectedStartDate != null &&
                                     selectedEndDate != null) {
                                   final survey = Survey(
-                                    surveyId: pastSurveys?.length ??
-                                        0, // ajillahgu bgaa
-                                    surveyStatus: isActive,
                                     surveyName: sName,
                                     surveyDescription: sDesc,
                                     surveyStartDate: selectedStartDate!,
                                     surveyEndDate: selectedEndDate!,
-                                    questions: [],
-                                    // questions: [],
+                                    surveyStatus: isActive,
                                   );
-
-                                  postSurvey(survey);
-                                  Navigator.push(
+                                  print('Survey to post: ${survey.toJson()}');
+                                  var res = await postSurvey(survey);
+                                  print(res["data"]["_id"]);
+                                  if (res["data"]["_id"] != null) {
+                                    Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              QuestionWidget()));
+                                        builder: (context) => QuestionWidget(
+                                            survey: survey,
+                                            id: res["data"]["_id"].toString()),
+                                      ),
+                                    );
+                                  } else {
+                                    print('Failed to get objectId');
+                                  }
                                 } else {
                                   print('Start and end dates are required');
                                 }
@@ -300,7 +270,6 @@ class _AdminDashState extends State<AdminDash> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
                 const SizedBox(height: 20),
               ],
             ),

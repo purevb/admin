@@ -19,14 +19,14 @@ class Answer {
 }
 
 class Question {
-  final int questionsID;
+  final String surveyID;
   final String questionsTypeID;
   final String questionText;
   final List<Answer>? answers;
   final bool isMandatory;
 
   Question({
-    required this.questionsID,
+    required this.surveyID,
     required this.questionsTypeID,
     required this.questionText,
     required this.answers,
@@ -39,7 +39,7 @@ class Question {
         answersFromJson.map((answer) => Answer.fromJson(answer)).toList();
 
     return Question(
-      questionsID: json['questions_id'],
+      surveyID: json['surveyID'],
       questionsTypeID: json['questions_type_id'],
       questionText: json['question_text'],
       answers: answersList,
@@ -48,7 +48,7 @@ class Question {
   }
 
   Map<String, dynamic> toJson() => {
-        "questions_id": questionsID,
+        "surveyID": surveyID,
         "questions_type_id": questionsTypeID,
         "question_text": questionText,
         "answers": answers != null

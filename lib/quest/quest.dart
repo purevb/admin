@@ -9,7 +9,13 @@ import 'package:admin/models/question_type_model.dart';
 import 'package:flutter/material.dart';
 
 class QuestWidget extends StatefulWidget {
-  QuestWidget({super.key});
+  final String id;
+
+  const QuestWidget({
+    Key? key,
+    required this.id,
+  }) : super(key: key);
+
   @override
   _QuestWidgetState createState() => _QuestWidgetState();
 }
@@ -167,7 +173,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                     children: [
                       Checkbox(
                         value: _isChecked[index],
-                        activeColor: Colors.purple,
+                        activeColor: Colors.black.withOpacity(0.5),
                         onChanged: (bool? value) {
                           setState(() {
                             _isChecked[index] = value!;
@@ -203,7 +209,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                 );
               } else if (dropdownValue == "Text") {
                 return Container(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
                       Expanded(
@@ -316,18 +322,19 @@ class _QuestWidgetState extends State<QuestWidget> {
               ),
             ),
           ),
-          Divider(height: 25),
+          const Divider(height: 25),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Row(
                 children: [
-                  IconButton(onPressed: () {}, icon: Icon(Icons.copy_rounded)),
                   IconButton(
-                      onPressed: () {}, icon: Icon(Icons.delete_outline)),
+                      onPressed: () {}, icon: const Icon(Icons.copy_rounded)),
+                  IconButton(
+                      onPressed: () {}, icon: const Icon(Icons.delete_outline)),
                 ],
               ),
-              VerticalDivider(
+              const VerticalDivider(
                 thickness: 5,
               ),
               SizedBox(
@@ -336,12 +343,13 @@ class _QuestWidgetState extends State<QuestWidget> {
                     children: [
                       Row(
                         children: [
-                          Text(
+                          const Text(
                             "Required",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Checkbox(
                               value: isMandatory,
+                              activeColor: Colors.black.withOpacity(0.6),
                               onChanged: (value) {
                                 setState(() {
                                   isMandatory = value!;
@@ -349,19 +357,19 @@ class _QuestWidgetState extends State<QuestWidget> {
                               }),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          print(ans);
+                          // print(widget.);
                           Question question;
                           List<Answer> answers =
                               ans.map((e) => Answer(answerText: e)).toList();
                           switch (dropdownValue) {
                             case "Multiple Choice":
                               question = Question(
-                                questionsID: pastQuestions?.length ?? 0,
+                                surveyID: widget.id,
                                 questionsTypeID: "669763b497492aac645169c1",
                                 questionText: ques,
                                 isMandatory: isMandatory,
@@ -370,8 +378,8 @@ class _QuestWidgetState extends State<QuestWidget> {
                               break;
                             case "Single Choice":
                               question = Question(
-                                questionsID: pastQuestions?.length ?? 0,
-                                questionsTypeID: "669763a597492aac645169bfc",
+                                surveyID: widget.id,
+                                questionsTypeID: "669763a597492aac645169bf",
                                 questionText: ques,
                                 isMandatory: isMandatory,
                                 answers: answers,
@@ -379,7 +387,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                               break;
                             case "Text":
                               question = Question(
-                                questionsID: pastQuestions?.length ?? 0,
+                                surveyID: widget.id,
                                 questionsTypeID: "6697639a97492aac645169bd",
                                 questionText: ques,
                                 isMandatory: isMandatory,
@@ -388,7 +396,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                               break;
                             case "Numeric":
                               question = Question(
-                                questionsID: pastQuestions?.length ?? 0,
+                                surveyID: widget.id,
                                 questionsTypeID: "6697638f97492aac645169bb",
                                 questionText: ques,
                                 isMandatory: isMandatory,
@@ -397,7 +405,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                               break;
                             case "Logical":
                               question = Question(
-                                questionsID: pastQuestions?.length ?? 0,
+                                surveyID: widget.id,
                                 questionsTypeID: "669763c097492aac645169c3",
                                 questionText: ques,
                                 isMandatory: isMandatory,
@@ -407,13 +415,13 @@ class _QuestWidgetState extends State<QuestWidget> {
                             default:
                               return;
                           }
-
                           postQuestion(question);
                         },
                         child: const Text("Save"),
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black.withOpacity(0.5),
-                            foregroundColor: Colors.white),
+                          backgroundColor: Colors.black.withOpacity(0.5),
+                          foregroundColor: Colors.white,
+                        ),
                       ),
                     ],
                   ),

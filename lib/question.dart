@@ -1,114 +1,149 @@
+import 'package:admin/models/question_model.dart';
+import 'package:admin/models/survey_model.dart';
 import 'package:admin/quest/quest.dart';
 import 'package:flutter/material.dart';
 
 class QuestionWidget extends StatefulWidget {
-  const QuestionWidget({super.key});
+  final Survey survey;
+  final String id;
+
+  const QuestionWidget({Key? key, required this.survey, required this.id})
+      : super(key: key);
 
   @override
   _QuestionWidgetState createState() => _QuestionWidgetState();
 }
 
-final _formKey = GlobalKey<FormState>();
-
 class _QuestionWidgetState extends State<QuestionWidget> {
   bool isMandatory = false;
   List<Widget> quests = [];
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: const Color(0xff333541),
-          title: const Text(
-            "Admin Dashboard",
-            style: TextStyle(color: Colors.white),
+        backgroundColor: const Color(0xff333541),
+        title: const Text(
+          "Admin Dashboard",
+          style: TextStyle(color: Colors.white),
+        ),
+        actions: <Widget>[
+          ElevatedButton(
+            onPressed: () {},
+            child: Text("Surveys"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xff333541),
+              foregroundColor: Colors.white,
+            ),
           ),
-          actions: <Widget>[
-            ElevatedButton(
-              onPressed: () {},
-              child: Text("Surveys"),
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xff333541),
-                  foregroundColor: Colors.white),
-            ),
-            SizedBox(
-              width: width * 0.2,
-            ),
-            const Placeholder(
-              fallbackHeight: 30,
-              fallbackWidth: 100,
-            ),
-            const SizedBox(
-              width: 20,
-            ),
-            const Placeholder(
-              fallbackHeight: 30,
-              fallbackWidth: 100,
-            ),
-            const SizedBox(
-              width: 20,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 20),
-              child: Container(
-                color: const Color(0xff8146f6),
-                child: IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {},
-                  color: Colors.white,
-                ),
+          SizedBox(
+            width: width * 0.2,
+          ),
+          const Placeholder(
+            fallbackHeight: 30,
+            fallbackWidth: 100,
+          ),
+          const SizedBox(
+            width: 20,
+          ),
+          const Placeholder(
+            fallbackHeight: 30,
+            fallbackWidth: 100,
+          ),
+          const SizedBox(
+            width: 20,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: Container(
+              color: const Color(0xff8146f6),
+              child: IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {},
+                color: Colors.white,
               ),
-            )
-          ]),
+            ),
+          )
+        ],
+      ),
       body: Container(
         child: SingleChildScrollView(
           child: Form(
-              key: _formKey,
-              child: Row(
-                children: [
-                  Container(
-                    width: width * 0.3,
-                    height: height + 20,
-                    color: const Color.fromARGB(255, 59, 59, 57),
-                  ),
-                  Column(
+            key: GlobalKey<FormState>(),
+            child: Row(
+              children: [
+                Container(
+                  width: width * 0.3,
+                  height: height + 20,
+                  color: const Color.fromARGB(255, 59, 59, 57),
+                  child: Column(
                     children: [
-                      const SizedBox(
-                        height: 10,
+                      Container(
+                        child: Text("Survey Name: " + widget.survey.surveyName),
                       ),
                       Container(
-                        padding: const EdgeInsets.only(left: 20),
-                        width: width * 0.7 - 30,
-                        height: height,
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                          itemBuilder: (BuildContext context, int index) {
-                            return quests[index];
-                          },
-                          separatorBuilder: (BuildContext context, int index) =>
-                              const SizedBox(
-                            height: 10,
-                          ),
-                          itemCount: quests.length,
-                        ),
-                      )
+                        child: Text("Survey description: " +
+                            widget.survey.surveyDescription),
+                      ),
+                      Container(
+                        child: Text("Survey status: " +
+                            widget.survey.surveyStatus.toString()),
+                      ),
+                      Container(
+                        child: Text("Survey start date: " +
+                            widget.survey.surveyStartDate
+                                .toString()
+                                .split(" ")[0]),
+                      ),
+                      Container(
+                        child: Text("Survey end date: " +
+                            widget.survey.surveyEndDate
+                                .toString()
+                                .split(' ')[0]),
+                      ),
                     ],
-                  )
-                ],
-              )),
+                  ),
+                ),
+                Column(
+                  children: [
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.only(left: 20),
+                      width: width * 0.7 - 30,
+                      height: height,
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemBuilder: (BuildContext context, int index) {
+                          return quests[index];
+                        },
+                        separatorBuilder: (BuildContext context, int index) =>
+                            const SizedBox(
+                          height: 10,
+                        ),
+                        itemCount: quests.length,
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            quests.add(QuestWidget());
-            // print(quests);
+            quests.add(QuestWidget(id: widget.id));
           });
+          print(widget.id);
         },
         child: const Icon(Icons.add),
         tooltip: "Add questions",
-        backgroundColor: Color(0xff15ae5c),
+        backgroundColor: const Color(0xff15ae5c),
       ),
     );
   }
