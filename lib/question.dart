@@ -1,4 +1,3 @@
-import 'package:admin/models/question_model.dart';
 import 'package:admin/models/survey_model.dart';
 import 'package:admin/quest/quest.dart';
 import 'package:flutter/material.dart';
@@ -7,16 +6,18 @@ class QuestionWidget extends StatefulWidget {
   final Survey survey;
   final String id;
 
-  const QuestionWidget({Key? key, required this.survey, required this.id})
+  QuestionWidget({Key? key, required this.survey, required this.id})
       : super(key: key);
 
   @override
   _QuestionWidgetState createState() => _QuestionWidgetState();
 }
 
+final _formKey = GlobalKey<FormState>();
+
 class _QuestionWidgetState extends State<QuestionWidget> {
   bool isMandatory = false;
-  List<Widget> quests = [];
+  List<QuestWidget> quests = [];
 
   @override
   Widget build(BuildContext context) {
@@ -68,70 +69,33 @@ class _QuestionWidgetState extends State<QuestionWidget> {
           )
         ],
       ),
-      body: Container(
-        child: SingleChildScrollView(
-          child: Form(
-            key: GlobalKey<FormState>(),
-            child: Row(
-              children: [
-                Container(
-                  width: width * 0.3,
-                  height: height + 20,
-                  color: const Color.fromARGB(255, 59, 59, 57),
-                  child: Column(
-                    children: [
-                      Container(
-                        child: Text("Survey Name: " + widget.survey.surveyName),
-                      ),
-                      Container(
-                        child: Text("Survey description: " +
-                            widget.survey.surveyDescription),
-                      ),
-                      Container(
-                        child: Text("Survey status: " +
-                            widget.survey.surveyStatus.toString()),
-                      ),
-                      Container(
-                        child: Text("Survey start date: " +
-                            widget.survey.surveyStartDate
-                                .toString()
-                                .split(" ")[0]),
-                      ),
-                      Container(
-                        child: Text("Survey end date: " +
-                            widget.survey.surveyEndDate
-                                .toString()
-                                .split(' ')[0]),
-                      ),
-                    ],
-                  ),
-                ),
-                Column(
-                  children: [
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.only(left: 20),
-                      width: width * 0.7 - 30,
-                      height: height,
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        itemBuilder: (BuildContext context, int index) {
-                          return quests[index];
-                        },
-                        separatorBuilder: (BuildContext context, int index) =>
-                            const SizedBox(
-                          height: 10,
-                        ),
-                        itemCount: quests.length,
-                      ),
-                    )
-                  ],
-                )
-              ],
+      body: Form(
+        key: _formKey,
+        child: Row(
+          children: [
+            Container(
+              width: width * 0.3,
+              height: height + 20,
+              color: const Color.fromARGB(255, 59, 59, 57),
+              child: SurveyDetails(survey: widget.survey),
             ),
-          ),
+            Container(
+              padding: const EdgeInsets.only(left: 20),
+              width: width * 0.7 - 30,
+              height: height,
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemBuilder: (BuildContext context, int index) {
+                  return quests[index];
+                },
+                separatorBuilder: (BuildContext context, int index) =>
+                    const SizedBox(
+                  height: 10,
+                ),
+                itemCount: quests.length,
+              ),
+            )
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -139,12 +103,30 @@ class _QuestionWidgetState extends State<QuestionWidget> {
           setState(() {
             quests.add(QuestWidget(id: widget.id));
           });
-          print(widget.id);
         },
         child: const Icon(Icons.add),
         tooltip: "Add questions",
         backgroundColor: const Color(0xff15ae5c),
       ),
+    );
+  }
+}
+
+class SurveyDetails extends StatelessWidget {
+  final Survey survey;
+  const SurveyDetails({Key? key, required this.survey}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text("Survey Name: ${survey.surveyName}"),
+        Text("Survey description: ${survey.surveyDescription}"),
+        Text("Survey status: ${survey.surveyStatus}"),
+        Text(
+            "Survey start date: ${survey.surveyStartDate.toString().split(" ")[0]}"),
+        Text(
+            "Survey end date: ${survey.surveyEndDate.toString().split(' ')[0]}"),
+      ],
     );
   }
 }

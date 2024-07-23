@@ -224,6 +224,7 @@ class _AdminDashState extends State<AdminDash> {
                               if (_formKey.currentState!.validate()) {
                                 bool isActive = selectedEndDate != null &&
                                     selectedEndDate!.isAfter(DateTime.now());
+
                                 if (selectedStartDate != null &&
                                     selectedEndDate != null) {
                                   final survey = Survey(
@@ -244,6 +245,10 @@ class _AdminDashState extends State<AdminDash> {
                                             survey: survey,
                                             id: res["data"]["_id"].toString()),
                                       ),
+                                      //         var surveyProvider =
+                                      //     Provider.of<SurveyProvider>(context,
+                                      //         listen: false);
+                                      // await surveyProvider.createSurvey(survey);
                                     );
                                   } else {
                                     print('Failed to get objectId');
