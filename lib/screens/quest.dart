@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:admin/models/survey_model.dart';
+import 'package:admin/provider/question_provider.dart';
 import 'package:admin/services/question_service.dart';
 import 'package:admin/services/question_type_service.dart';
 import 'package:admin/services/survey_services.dart';
@@ -7,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:admin/models/question_model.dart';
 import 'package:admin/models/question_type_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class QuestWidget extends StatefulWidget {
   final String id;
@@ -329,9 +331,16 @@ class _QuestWidgetState extends State<QuestWidget> {
               Row(
                 children: [
                   IconButton(
-                      onPressed: () {}, icon: const Icon(Icons.copy_rounded)),
+                    onPressed: () {},
+                    icon: const Icon(Icons.copy_rounded),
+                  ),
                   IconButton(
-                      onPressed: () {}, icon: const Icon(Icons.delete_outline)),
+                    onPressed: () {
+                      Provider.of<QuestionProvider>(context, listen: false)
+                          .removeQuestion(widget);
+                    },
+                    icon: const Icon(Icons.delete_outline),
+                  ),
                 ],
               ),
               const VerticalDivider(
@@ -348,13 +357,14 @@ class _QuestWidgetState extends State<QuestWidget> {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Checkbox(
-                              value: isMandatory,
-                              activeColor: Colors.black.withOpacity(0.6),
-                              onChanged: (value) {
-                                setState(() {
-                                  isMandatory = value!;
-                                });
-                              }),
+                            value: isMandatory,
+                            activeColor: Colors.black.withOpacity(0.6),
+                            onChanged: (value) {
+                              setState(() {
+                                isMandatory = value!;
+                              });
+                            },
+                          ),
                         ],
                       ),
                       const SizedBox(

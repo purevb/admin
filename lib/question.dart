@@ -1,6 +1,10 @@
+import 'package:admin/models/all_survey_model.dart';
 import 'package:admin/models/survey_model.dart';
-import 'package:admin/quest/quest.dart';
+import 'package:admin/provider/question_provider.dart';
+import 'package:admin/screens/allSurveys.dart';
+import 'package:admin/screens/quest.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class QuestionWidget extends StatefulWidget {
   final Survey survey;
@@ -13,16 +17,15 @@ class QuestionWidget extends StatefulWidget {
   _QuestionWidgetState createState() => _QuestionWidgetState();
 }
 
-final _formKey = GlobalKey<FormState>();
-
 class _QuestionWidgetState extends State<QuestionWidget> {
+  final _formKey = GlobalKey<FormState>();
   bool isMandatory = false;
-  List<QuestWidget> quests = [];
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xff333541),
@@ -32,10 +35,13 @@ class _QuestionWidgetState extends State<QuestionWidget> {
         ),
         actions: <Widget>[
           ElevatedButton(
-            onPressed: () {},
-            child: Text("Surveys"),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => AllSurveys()));
+            },
+            child: const Text("Surveys"),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xff333541),
+              backgroundColor: const Color(0xff333541),
               foregroundColor: Colors.white,
             ),
           ),
@@ -80,29 +86,32 @@ class _QuestionWidgetState extends State<QuestionWidget> {
               child: SurveyDetails(survey: widget.survey),
             ),
             Container(
-              padding: const EdgeInsets.only(left: 20),
+              padding: const EdgeInsets.only(top: 20, left: 20),
               width: width * 0.7 - 30,
               height: height,
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemBuilder: (BuildContext context, int index) {
-                  return quests[index];
+              child: Consumer<QuestionProvider>(
+                builder: (context, questionProvider, child) {
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    itemBuilder: (BuildContext context, int index) {
+                      return questionProvider.quests[index];
+                    },
+                    separatorBuilder: (BuildContext context, int index) =>
+                        const SizedBox(
+                      height: 10,
+                    ),
+                    itemCount: questionProvider.quests.length,
+                  );
                 },
-                separatorBuilder: (BuildContext context, int index) =>
-                    const SizedBox(
-                  height: 10,
-                ),
-                itemCount: quests.length,
               ),
-            )
+            ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(() {
-            quests.add(QuestWidget(id: widget.id));
-          });
+          Provider.of<QuestionProvider>(context, listen: false)
+              .addQuestion(QuestWidget(id: widget.id));
         },
         child: const Icon(Icons.add),
         tooltip: "Add questions",
@@ -115,6 +124,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
 class SurveyDetails extends StatelessWidget {
   final Survey survey;
   const SurveyDetails({Key? key, required this.survey}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Column(

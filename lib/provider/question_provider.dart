@@ -1,7 +1,15 @@
-import 'package:admin/quest/quest.dart';
 import 'package:flutter/material.dart';
 
-class CommonProvider extends ChangeNotifier {
-  List<QuestWidget> quests = [];
-  void addQuestion() {}
+class QuestionProvider extends ChangeNotifier {
+  List<Widget> quests = [];
+
+  void addQuestion(Widget widget) {
+    quests.add(widget);
+    notifyListeners();
+  }
+
+  void removeQuestion(Widget widget) {
+    quests.remove(widget);
+    notifyListeners();
+  }
 }
