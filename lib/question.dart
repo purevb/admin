@@ -28,6 +28,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: const Color(0xff333541),
         title: const Text(
           "Admin Dashboard",
@@ -68,7 +69,11 @@ class _QuestionWidgetState extends State<QuestionWidget> {
               color: const Color(0xff8146f6),
               child: IconButton(
                 icon: const Icon(Icons.add),
-                onPressed: () {},
+                onPressed: () {
+                  Provider.of<QuestionProvider>(context, listen: false)
+                      .addQuestion(QuestWidget(id: widget.id));
+                },
+                tooltip: "Add Question",
                 color: Colors.white,
               ),
             ),
@@ -109,13 +114,10 @@ class _QuestionWidgetState extends State<QuestionWidget> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Provider.of<QuestionProvider>(context, listen: false)
-              .addQuestion(QuestWidget(id: widget.id));
-        },
-        child: const Icon(Icons.add),
-        tooltip: "Add questions",
+        onPressed: () {},
+        child: const Icon(Icons.save),
         backgroundColor: const Color(0xff15ae5c),
+        tooltip: "Save all question",
       ),
     );
   }
@@ -128,6 +130,7 @@ class SurveyDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("Survey Name: ${survey.surveyName}"),
         Text("Survey description: ${survey.surveyDescription}"),

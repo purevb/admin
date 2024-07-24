@@ -1,4 +1,5 @@
 import 'package:admin/models/all_survey_model.dart';
+import 'package:admin/screens/survey_Details.dart';
 import 'package:admin/services/all_survey.dart';
 import 'package:flutter/material.dart';
 
@@ -9,19 +10,20 @@ class AllSurveys extends StatefulWidget {
 }
 
 class _AllSurveyWidgetState extends State<AllSurveys> {
-  final _formKey = GlobalKey<FormState>();
   bool isMandatory = false;
+
+  List<AllSurvey>? allSurveys;
+  bool isLoaded = false;
+
   @override
   void initState() {
     super.initState();
     getData();
   }
 
-  List<AllSurvey>? AllSurveys;
-  var isLoaded = false;
   Future<void> getData() async {
-    AllSurveys = await AllSurveyRemoteService().getAllSurvey();
-    if (AllSurveys != null && AllSurveys!.isNotEmpty) {
+    allSurveys = await AllSurveyRemoteService().getAllSurvey();
+    if (allSurveys != null && allSurveys!.isNotEmpty) {
       setState(() {
         isLoaded = true;
       });
@@ -30,46 +32,70 @@ class _AllSurveyWidgetState extends State<AllSurveys> {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: const Color(0xff333541),
         centerTitle: true,
-        title: Text(
+        title: const Text(
           "All surveys",
           style: TextStyle(color: Colors.white),
         ),
       ),
-      body: Container(
-        width: width,
-        height: height,
-        child: isLoaded ? _buildSurveyList() : _buildLoadingIndicator(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: isLoaded
+              ? ClipRect(
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 300,
+                      childAspectRatio: 2 / 2,
+                      crossAxisSpacing: 20,
+                      mainAxisSpacing: 20,
+                    ),
+                    itemCount: allSurveys!.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  SurveyDetailWidget(id: allSurveys![index].id),
+                            ),
+                          );
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            color: Colors.black.withOpacity(0.5),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Survey Name: ${allSurveys![index].surveyName}",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                )
+              : const Center(
+                  child: CircularProgressIndicator(),
+                ),
+        ),
       ),
-    );
-  }
-
-  Widget _buildSurveyList() {
-    if (AllSurveys != null && AllSurveys!.isNotEmpty) {
-      return ListView.builder(
-        itemCount: AllSurveys!.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(AllSurveys![index].questionText),
-          );
-        },
-      );
-    } else {
-      return Center(
-        child: Text("No surveys available"),
-      );
-    }
-  }
-
-  Widget _buildLoadingIndicator() {
-    return Center(
-      child: CircularProgressIndicator(),
     );
   }
 }

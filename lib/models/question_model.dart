@@ -29,7 +29,7 @@ class Question {
     required this.surveyID,
     required this.questionsTypeID,
     required this.questionText,
-    required this.answers,
+    this.answers,
     required this.isMandatory,
   });
 

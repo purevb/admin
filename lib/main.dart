@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFf9f9fb)),
         debugShowCheckedModeBanner: false,
-        home: AllSurveys(),
+        home: AdminDash(),
       ),
     );
   }
