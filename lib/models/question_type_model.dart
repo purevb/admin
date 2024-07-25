@@ -2,16 +2,19 @@
 import 'dart:convert';
 
 class QuestionType {
+  final String? id;
   int questionsTypeId;
   String questionType;
 
   QuestionType({
+    this.id,
     required this.questionsTypeId,
     required this.questionType,
   });
 
   factory QuestionType.fromJson(Map<String, dynamic> json) {
     return QuestionType(
+      id: json['_id'],
       questionsTypeId: json['questions_type_id'],
       questionType: json['question_type'],
     );

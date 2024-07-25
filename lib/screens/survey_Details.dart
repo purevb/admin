@@ -49,7 +49,6 @@ class _SurveyDetailWidgetState extends State<SurveyDetailWidget> {
               ? ListView.builder(
                   itemCount: allSurveys!.length,
                   itemBuilder: (BuildContext context, int index) {
-                    // Find the survey matching the widget.id
                     if (allSurveys![index].id == widget.id) {
                       return Padding(
                         padding: const EdgeInsets.all(16.0),

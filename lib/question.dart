@@ -20,7 +20,6 @@ class QuestionWidget extends StatefulWidget {
 class _QuestionWidgetState extends State<QuestionWidget> {
   final _formKey = GlobalKey<FormState>();
   bool isMandatory = false;
-
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -114,10 +113,31 @@ class _QuestionWidgetState extends State<QuestionWidget> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          // List<Answer> answers = ans.map((e) => Answer(answerText: e)).toList();
+          // for (var type in pastTypes!) {
+          //   if (dropdownValue == type.questionType) {
+          //     asuult.add(
+          //       Question(
+          //         surveyID: widget.id,
+          //         questionsTypeID: type.id ?? "",
+          //         questionText: ques,
+          //         isMandatory: isMandatory,
+          //         answers: answers,
+          //       ),
+          //     );
+          //     break;
+          //   }
+          // }
+          // if (asuult.isNotEmpty) {
+          //   postQuestion(asuult);
+          // } else {
+          //   print('Question type taarsngu.');
+          // }
+        },
         child: const Icon(Icons.save),
         backgroundColor: const Color(0xff15ae5c),
-        tooltip: "Save all question",
+        tooltip: "Save all questions",
       ),
     );
   }
@@ -129,17 +149,27 @@ class SurveyDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("Survey Name: ${survey.surveyName}"),
-        Text("Survey description: ${survey.surveyDescription}"),
-        Text("Survey status: ${survey.surveyStatus}"),
-        Text(
-            "Survey start date: ${survey.surveyStartDate.toString().split(" ")[0]}"),
-        Text(
-            "Survey end date: ${survey.surveyEndDate.toString().split(' ')[0]}"),
-      ],
+    return Padding(
+      padding: EdgeInsets.only(right: 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Survey Name: ${survey.surveyName}",
+            style: TextStyle(color: Colors.white),
+          ),
+          Text("Survey description: ${survey.surveyDescription}",
+              style: TextStyle(color: Colors.white)),
+          Text("Survey status: ${survey.surveyStatus}",
+              style: TextStyle(color: Colors.white)),
+          Text(
+              "Survey start date: ${survey.surveyStartDate.toString().split(" ")[0]}",
+              style: TextStyle(color: Colors.white)),
+          Text(
+              "Survey end date: ${survey.surveyEndDate.toString().split(' ')[0]}",
+              style: TextStyle(color: Colors.white)),
+        ],
+      ),
     );
   }
 }

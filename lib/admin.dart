@@ -245,10 +245,6 @@ class _AdminDashState extends State<AdminDash> {
                                             survey: survey,
                                             id: res["data"]["_id"].toString()),
                                       ),
-                                      //         var surveyProvider =
-                                      //     Provider.of<SurveyProvider>(context,
-                                      //         listen: false);
-                                      // await surveyProvider.createSurvey(survey);
                                     );
                                   } else {
                                     print('Failed to get objectId');

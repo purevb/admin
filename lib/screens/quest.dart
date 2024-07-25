@@ -26,6 +26,7 @@ class _QuestWidgetState extends State<QuestWidget> {
   bool isMandatory = false;
   int _selectedValue = 1;
   int number = 1;
+  var dataProvider = QuestionProvider();
   final List<TextEditingController> _controllers = [];
   final List<int> _values = [];
   final List<bool> _isChecked = [];
@@ -37,10 +38,11 @@ class _QuestWidgetState extends State<QuestWidget> {
   var isLoaded = false;
   List<QuestionType>? pastTypes;
   List<Question>? pastQuestions;
-  List<Survey>? pastSurveys;
   List<String> list = [];
   String? dropdownValue;
   int urt = 0;
+
+  List<Question>? asuult = [];
 
   @override
   void initState() {
@@ -52,7 +54,6 @@ class _QuestWidgetState extends State<QuestWidget> {
     try {
       pastTypes = await TypesRemoteService().getType();
       pastQuestions = await QuestionRemoteService().getQuestion();
-      pastSurveys = await SurveyRemoteService().getSurvey();
       setState(() {
         isLoaded = true;
         if (pastTypes != null && pastTypes!.isNotEmpty) {
@@ -222,13 +223,7 @@ class _QuestWidgetState extends State<QuestWidget> {
                             enabledBorder: InputBorder.none,
                           ),
                           onChanged: (value) {
-                            setState(() {
-                              if (index < ans.length) {
-                                ans[index] = value;
-                              } else {
-                                ans.add(value);
-                              }
-                            });
+                            setState(() {});
                           },
                         ),
                       ),
@@ -372,60 +367,28 @@ class _QuestWidgetState extends State<QuestWidget> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          // print(widget.);
-                          Question question;
+                          Question? question;
                           List<Answer> answers =
                               ans.map((e) => Answer(answerText: e)).toList();
-                          switch (dropdownValue) {
-                            case "Multiple Choice":
+                          for (var type in pastTypes!) {
+                            if (dropdownValue == type.questionType) {
+                              // dataProvider.quests.add();
+
                               question = Question(
                                 surveyID: widget.id,
-                                questionsTypeID: "669763b497492aac645169c1",
+                                questionsTypeID: type.id ?? "",
                                 questionText: ques,
                                 isMandatory: isMandatory,
                                 answers: answers,
                               );
                               break;
-                            case "Single Choice":
-                              question = Question(
-                                surveyID: widget.id,
-                                questionsTypeID: "669763a597492aac645169bf",
-                                questionText: ques,
-                                isMandatory: isMandatory,
-                                answers: answers,
-                              );
-                              break;
-                            case "Text":
-                              question = Question(
-                                surveyID: widget.id,
-                                questionsTypeID: "6697639a97492aac645169bd",
-                                questionText: ques,
-                                isMandatory: isMandatory,
-                                answers: answers,
-                              );
-                              break;
-                            case "Numeric":
-                              question = Question(
-                                surveyID: widget.id,
-                                questionsTypeID: "6697638f97492aac645169bb",
-                                questionText: ques,
-                                isMandatory: isMandatory,
-                                answers: answers,
-                              );
-                              break;
-                            case "Logical":
-                              question = Question(
-                                surveyID: widget.id,
-                                questionsTypeID: "669763c097492aac645169c3",
-                                questionText: ques,
-                                isMandatory: isMandatory,
-                                answers: answers,
-                              );
-                              break;
-                            default:
-                              return;
+                            }
                           }
-                          postQuestion(question);
+                          if (question != null) {
+                            postQuestion(question);
+                          } else {
+                            print('Question type taarsngu.');
+                          }
                         },
                         child: const Text("Save"),
                         style: ElevatedButton.styleFrom(

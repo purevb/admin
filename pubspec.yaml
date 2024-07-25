@@ -38,6 +38,7 @@ dependencies:
   http: ^1.2.1
   flutter_quill: ^9.3.11
   provider: ^6.1.2
+  dio: ^5.5.0+1
 
 dev_dependencies:
   flutter_test:
