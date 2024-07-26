@@ -80,6 +80,8 @@ class _EditSurveyDetailWidgetState extends State<EditSurveyDetailWidget> {
 
       bool questionsUpdated = true;
       for (var editor in questionEditors) {
+        print(questionEditors.length);
+        print(editor.questionTextController.text);
         final updatedQuestion = {
           "question_text": editor.questionTextController.text,
         };
@@ -88,18 +90,19 @@ class _EditSurveyDetailWidgetState extends State<EditSurveyDetailWidget> {
         if (!questionResponse) {
           questionsUpdated = false;
         }
-        for (var answerEditor in editor.answerEditors) {
-          final updatedAnswer = {
-            "answer_text": answerEditor.answerTextController.text,
-          };
-          final answerResponse = await AllSurveyRemoteService()
-              .updateQuestion(answerEditor.answer.id, updatedAnswer);
-          if (!answerResponse) {
-            questionsUpdated = false;
-          }
-        }
-      }
 
+        // for (var answerEditor in editor.answerEditors) {
+        //   final updatedAnswer = {
+        //     "answer_text": answerEditor.answerTextController.text,
+        //   };
+        //   // Ensure you have a correct method to update the answer
+        //   final answerResponse = await AllSurveyRemoteService()
+        //       .updater(answerEditor.answer.id, updatedAnswer);
+        //   if (!answerResponse) {
+        //     questionsUpdated = false;
+        //   }
+        // }
+      }
       if (surveyResponse && questionsUpdated) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
