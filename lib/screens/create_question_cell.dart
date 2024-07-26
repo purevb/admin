@@ -1,5 +1,8 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'dart:convert';
 import 'package:admin/models/survey_model.dart';
+import 'package:admin/provider/question_provider.dart';
 import 'package:admin/provider/question_provider.dart';
 import 'package:admin/services/question_service.dart';
 import 'package:admin/services/question_type_service.dart';
@@ -26,41 +29,29 @@ class _QuestWidgetState extends State<QuestWidget> {
   bool isMandatory = false;
   int _selectedValue = 1;
   int number = 1;
-  var dataProvider = QuestionProvider();
   final List<TextEditingController> _controllers = [];
   final List<int> _values = [];
   final List<bool> _isChecked = [];
-  List<Widget> quests = [];
+  final List<String> ans = [];
   final _questionController = TextEditingController();
   final _textController = TextEditingController();
   String ques = '';
-  List<String> ans = [];
-  var isLoaded = false;
   List<QuestionType>? pastTypes;
-  List<Question>? pastQuestions;
   List<String> list = [];
   String? dropdownValue;
-  int urt = 0;
-
-  List<Question>? asuult = [];
 
   @override
   void initState() {
     super.initState();
-    getData();
+    getQuestionTypeData();
   }
 
-  Future<void> getData() async {
+  Future<void> getQuestionTypeData() async {
     try {
       pastTypes = await TypesRemoteService().getType();
-      pastQuestions = await QuestionRemoteService().getQuestion();
       setState(() {
-        isLoaded = true;
         if (pastTypes != null && pastTypes!.isNotEmpty) {
-          list = List.generate(
-            pastTypes!.length,
-            (index) => pastTypes![index].questionType,
-          );
+          list = pastTypes!.map((type) => type.questionType).toList();
           dropdownValue = list.isNotEmpty ? list.first : null;
         } else {
           dropdownValue = null;
@@ -68,9 +59,6 @@ class _QuestWidgetState extends State<QuestWidget> {
       });
     } catch (e) {
       print('Error fetching data: $e');
-      setState(() {
-        isLoaded = false;
-      });
     }
   }
 
@@ -84,28 +72,8 @@ class _QuestWidgetState extends State<QuestWidget> {
     });
   }
 
-  Future<void> postQuestion(Question question) async {
-    final url = Uri.parse('http://localhost:3106/api/question');
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode(question.toJson()),
-    );
-
-    if (response.statusCode == 200) {
-      print('Question saved successfully');
-    } else {
-      print('Failed to save question');
-      print(response.body);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -365,37 +333,16 @@ class _QuestWidgetState extends State<QuestWidget> {
                       const SizedBox(
                         width: 5,
                       ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Question? question;
-                          List<Answer> answers =
-                              ans.map((e) => Answer(answerText: e)).toList();
-                          for (var type in pastTypes!) {
-                            if (dropdownValue == type.questionType) {
-                              // dataProvider.quests.add();
+                      // ElevatedButton(
+                      //   onPressed: () {
 
-                              question = Question(
-                                surveyID: widget.id,
-                                questionsTypeID: type.id ?? "",
-                                questionText: ques,
-                                isMandatory: isMandatory,
-                                answers: answers,
-                              );
-                              break;
-                            }
-                          }
-                          if (question != null) {
-                            postQuestion(question);
-                          } else {
-                            print('Question type taarsngu.');
-                          }
-                        },
-                        child: const Text("Save"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black.withOpacity(0.5),
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
+                      //   },
+                      //   child: const Text("Save"),
+                      //   style: ElevatedButton.styleFrom(
+                      //     backgroundColor: Colors.black.withOpacity(0.5),
+                      //     foregroundColor: Colors.white,
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

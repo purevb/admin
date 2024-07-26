@@ -99,17 +99,6 @@ class _AdminDashState extends State<AdminDash> {
             SizedBox(
               width: 20,
             ),
-            Padding(
-              padding: EdgeInsets.only(right: 20),
-              child: Container(
-                color: Color(0xff8146f6),
-                child: IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: () {},
-                  color: Colors.white,
-                ),
-              ),
-            )
           ]),
       body: SingleChildScrollView(
         child: Form(

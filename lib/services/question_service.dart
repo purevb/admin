@@ -2,7 +2,7 @@ import 'package:admin/models/question_model.dart';
 import 'package:http/http.dart' as http;
 
 class QuestionRemoteService {
-  Future<List<Question>?> getQuestion() async {
+  Future<List<QuestionModel>?> getQuestion() async {
     var clientls = http.Client();
     var urils = Uri.parse('http://localhost:3106/api/question');
     try {

@@ -1,10 +1,11 @@
+import 'package:admin/provider/question_provider.dart';
+import 'package:admin/screens/edit_Survey_Details.dart';
 import 'package:flutter/material.dart';
 import 'package:admin/models/all_survey_model.dart';
 import 'package:admin/services/all_survey.dart';
 
 class SurveyDetailWidget extends StatefulWidget {
   final String id;
-
   const SurveyDetailWidget({Key? key, required this.id}) : super(key: key);
 
   @override
@@ -14,6 +15,8 @@ class SurveyDetailWidget extends StatefulWidget {
 class _SurveyDetailWidgetState extends State<SurveyDetailWidget> {
   List<AllSurvey>? allSurveys;
   bool isLoaded = false;
+  var idProvider = QuestionProvider();
+  List<String>? questionIds;
 
   @override
   void initState() {
@@ -43,6 +46,22 @@ class _SurveyDetailWidgetState extends State<SurveyDetailWidget> {
           "Survey",
           style: TextStyle(color: Colors.white),
         ),
+        actions: [
+          IconButton(
+            color: Colors.white,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditSurveyDetailWidget(
+                    id: widget.id,
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(Icons.edit),
+          ),
+        ],
       ),
       body: isLoaded
           ? (allSurveys != null && allSurveys!.isNotEmpty
@@ -56,7 +75,7 @@ class _SurveyDetailWidgetState extends State<SurveyDetailWidget> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              padding: EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                   border: Border.all(),
                                   borderRadius: BorderRadius.circular(5)),
@@ -64,50 +83,52 @@ class _SurveyDetailWidgetState extends State<SurveyDetailWidget> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
+                                    // questionIds.toString(),
                                     'Survey Name: ${allSurveys![index].surveyName}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontStyle: FontStyle.italic,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 24),
                                   ),
-                                  SizedBox(height: 8),
+                                  const SizedBox(height: 8),
                                   Text(
                                     'Survey Description: ${allSurveys![index].surveyDescription}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontStyle: FontStyle.italic,
                                         fontSize: 18),
                                   ),
-                                  SizedBox(height: 8),
+                                  const SizedBox(height: 8),
                                   Text(
                                       'Survey Start Date: ${allSurveys![index].startDate.toString().split(" ")[0]}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontStyle: FontStyle.italic)),
-                                  SizedBox(height: 8),
+                                  const SizedBox(height: 8),
                                   Text(
                                       'Survey End Date: ${allSurveys![index].endDate.toString().split(" ")[0]}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontStyle: FontStyle.italic)),
-                                  SizedBox(height: 8),
+                                  const SizedBox(height: 8),
                                   Text(
                                       'Survey Status: ${allSurveys![index].surveyStatus ? 'Active' : 'Inactive'}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontStyle: FontStyle.italic)),
                                 ],
                               ),
                             ),
-                            SizedBox(height: 16),
-                            Text('Survey Questions:',
+                            const SizedBox(height: 16),
+                            const Text('Survey Questions:',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontStyle: FontStyle.italic)),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children:
                                   allSurveys![index].question.map((question) {
                                 return Container(
-                                    margin: EdgeInsets.only(bottom: 5),
-                                    padding: EdgeInsets.only(right: 5, left: 2),
+                                    margin: const EdgeInsets.only(bottom: 5),
+                                    padding: const EdgeInsets.only(
+                                        right: 5, left: 2),
                                     decoration: BoxDecoration(
                                         border: Border.all(
                                             color:
@@ -119,11 +140,11 @@ class _SurveyDetailWidgetState extends State<SurveyDetailWidget> {
                                       children: [
                                         Text(
                                           question.questionText,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontStyle: FontStyle.italic),
                                         ),
-                                        SizedBox(height: 4),
+                                        const SizedBox(height: 4),
                                         Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -131,12 +152,12 @@ class _SurveyDetailWidgetState extends State<SurveyDetailWidget> {
                                               question.answerText.map((answer) {
                                             return Text(
                                               answer.answerText,
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                   fontStyle: FontStyle.italic),
                                             );
                                           }).toList(),
                                         ),
-                                        SizedBox(height: 8),
+                                        const SizedBox(height: 8),
                                       ],
                                     ));
                               }).toList(),
@@ -149,8 +170,8 @@ class _SurveyDetailWidgetState extends State<SurveyDetailWidget> {
                     }
                   },
                 )
-              : Center(child: Text('No surveys available')))
-          : Center(child: CircularProgressIndicator()),
+              : const Center(child: Text('No surveys available')))
+          : const Center(child: CircularProgressIndicator()),
     );
   }
 }

@@ -72,18 +72,20 @@ class _AllSurveyWidgetState extends State<AllSurveys> {
                           borderRadius: BorderRadius.circular(8),
                           child: Container(
                             color: Colors.black.withOpacity(0.5),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Survey Name: ${allSurveys![index].surveyName}",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontStyle: FontStyle.italic,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Survey Name: ${allSurveys![index].surveyName}",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontStyle: FontStyle.italic,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),

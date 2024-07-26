@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:admin/models/all_survey_model.dart';
 import 'package:admin/models/survey_model.dart';
 import 'package:admin/provider/question_provider.dart';
 import 'package:admin/screens/allSurveys.dart';
-import 'package:admin/screens/quest.dart';
+import 'package:admin/services/question_type_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'models/question_model.dart';
+import 'models/question_type_model.dart';
+import 'screens/create_question_cell.dart';
 
 class QuestionWidget extends StatefulWidget {
   final Survey survey;
@@ -20,6 +26,71 @@ class QuestionWidget extends StatefulWidget {
 class _QuestionWidgetState extends State<QuestionWidget> {
   final _formKey = GlobalKey<FormState>();
   bool isMandatory = false;
+  int _selectedValue = 1;
+  int number = 1;
+  final List<TextEditingController> _controllers = [];
+  final List<int> _values = [];
+  final List<bool> _isChecked = [];
+  final List<String> ans = [];
+  final _questionController = TextEditingController();
+  final _textController = TextEditingController();
+  String ques = '';
+  List<QuestionType>? pastTypes;
+  List<String> list = [];
+  String? dropdownValue;
+
+  var dataProvider = QuestionProvider();
+
+  Future<void> postQuestion(List<QuestionModel?> question) async {
+    final url = Uri.parse('http://localhost:3106/api/question');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(question.map((q) => q?.toJson()).toList()),
+      );
+
+      if (response.statusCode == 200) {
+        print('Question saved successfully');
+      } else {
+        print('Failed to save question. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+      }
+    } catch (e) {
+      print('Error occurred while posting question: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getQuestionTypeData();
+  }
+
+  Future<void> getQuestionTypeData() async {
+    try {
+      pastTypes = await TypesRemoteService().getType();
+      setState(() {
+        if (pastTypes != null && pastTypes!.isNotEmpty) {
+          list = pastTypes!.map((type) => type.questionType).toList();
+          dropdownValue = list.isNotEmpty ? list.first : null;
+        } else {
+          dropdownValue = null;
+        }
+      });
+    } catch (e) {
+      print('Error fetching data: $e');
+    }
+  }
+
+  void debugPrintQuestions() {
+    for (var question in dataProvider.questions) {
+      print('Question to send: ${question?.toJson()}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -114,26 +185,32 @@ class _QuestionWidgetState extends State<QuestionWidget> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // List<Answer> answers = ans.map((e) => Answer(answerText: e)).toList();
-          // for (var type in pastTypes!) {
-          //   if (dropdownValue == type.questionType) {
-          //     asuult.add(
-          //       Question(
-          //         surveyID: widget.id,
-          //         questionsTypeID: type.id ?? "",
-          //         questionText: ques,
-          //         isMandatory: isMandatory,
-          //         answers: answers,
-          //       ),
-          //     );
-          //     break;
-          //   }
-          // }
-          // if (asuult.isNotEmpty) {
-          //   postQuestion(asuult);
-          // } else {
-          //   print('Question type taarsngu.');
-          // }
+          if (ques.isEmpty) {
+            print('Question text is empty.');
+            return;
+          }
+          List<AnswerModel> answers =
+              ans.map((e) => AnswerModel(answerText: e)).toList();
+          for (var type in pastTypes!) {
+            if (dropdownValue == type.questionType) {
+              dataProvider.addQuestionData(
+                QuestionModel(
+                  surveyID: widget.id,
+                  questionsTypeID: type.id ?? "",
+                  questionText: ques,
+                  isMandatory: isMandatory,
+                  answers: answers,
+                ),
+              );
+              break;
+            }
+          }
+          debugPrintQuestions();
+          if (dataProvider.questions.isNotEmpty) {
+            postQuestion(dataProvider.questions);
+          } else {
+            print('No questions to save.');
+          }
         },
         child: const Icon(Icons.save),
         backgroundColor: const Color(0xff15ae5c),

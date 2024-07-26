@@ -1,14 +1,14 @@
 import 'dart:convert';
 
-class Answer {
+class AnswerModel {
   final String answerText;
 
-  Answer({
+  AnswerModel({
     required this.answerText,
   });
 
-  factory Answer.fromJson(Map<String, dynamic> json) {
-    return Answer(
+  factory AnswerModel.fromJson(Map<String, dynamic> json) {
+    return AnswerModel(
       answerText: json['answer_text'],
     );
   }
@@ -18,14 +18,14 @@ class Answer {
       };
 }
 
-class Question {
+class QuestionModel {
   final String surveyID;
   final String questionsTypeID;
   final String questionText;
-  final List<Answer>? answers;
+  final List<AnswerModel>? answers;
   final bool isMandatory;
 
-  Question({
+  QuestionModel({
     required this.surveyID,
     required this.questionsTypeID,
     required this.questionText,
@@ -33,12 +33,12 @@ class Question {
     required this.isMandatory,
   });
 
-  factory Question.fromJson(Map<String, dynamic> json) {
+  factory QuestionModel.fromJson(Map<String, dynamic> json) {
     var answersFromJson = json['answers'] as List;
-    List<Answer> answersList =
-        answersFromJson.map((answer) => Answer.fromJson(answer)).toList();
+    List<AnswerModel> answersList =
+        answersFromJson.map((answer) => AnswerModel.fromJson(answer)).toList();
 
-    return Question(
+    return QuestionModel(
       surveyID: json['surveyID'],
       questionsTypeID: json['questions_type_id'],
       questionText: json['question_text'],
@@ -58,12 +58,12 @@ class Question {
       };
 }
 
-List<Question> questionFromJson(String str) {
+List<QuestionModel> questionFromJson(String str) {
   final jsonData = json.decode(str);
-  return List<Question>.from(
-    jsonData["question"].map((x) => Question.fromJson(x)),
+  return List<QuestionModel>.from(
+    jsonData["question"].map((x) => QuestionModel.fromJson(x)),
   );
 }
 
-String questionToJson(List<Question> data) =>
+String questionToJson(List<QuestionModel> data) =>
     json.encode({"question": List<dynamic>.from(data.map((x) => x.toJson()))});

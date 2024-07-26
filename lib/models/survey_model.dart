@@ -21,9 +21,7 @@ class Survey {
       surveyName: json['survey_name'],
       surveyDescription: json['survey_description'],
       surveyStartDate: DateTime.parse(json['survey_start_date']),
-      surveyEndDate: json['survey_end_date'] != null
-          ? DateTime.parse(json['survey_end_date'])
-          : DateTime.now(),
+      surveyEndDate: DateTime.parse(json['survey_end_date']),
       surveyStatus: json['survey_status'],
     );
   }

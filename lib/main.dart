@@ -1,4 +1,5 @@
 import 'package:admin/admin.dart';
+import 'package:admin/screens/allSurveys.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:admin/provider/question_provider.dart';
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFf9f9fb)),
         debugShowCheckedModeBanner: false,
-        home: const AdminDash(),
+        home: AllSurveys(),
       ),
     );
   }
