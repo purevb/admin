@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:admin/models/question_model.dart';
 
 class Survey {
   String surveyName;

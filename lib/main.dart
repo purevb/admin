@@ -1,5 +1,4 @@
-import 'package:admin/admin.dart';
-import 'package:admin/screens/allSurveys.dart';
+import 'package:admin/screens/all_surveys.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:admin/provider/question_provider.dart';
@@ -9,7 +8,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

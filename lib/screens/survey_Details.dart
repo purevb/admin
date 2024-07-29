@@ -1,21 +1,19 @@
-import 'package:admin/provider/question_provider.dart';
-import 'package:admin/screens/edit_Survey_Details.dart';
+import 'package:admin/screens/edit_survey_details.dart';
 import 'package:flutter/material.dart';
 import 'package:admin/models/all_survey_model.dart';
 import 'package:admin/services/all_survey.dart';
 
 class SurveyDetailWidget extends StatefulWidget {
   final String id;
-  const SurveyDetailWidget({Key? key, required this.id}) : super(key: key);
+  const SurveyDetailWidget({super.key, required this.id});
 
   @override
-  _SurveyDetailWidgetState createState() => _SurveyDetailWidgetState();
+  SurveyDetailWidgetState createState() => SurveyDetailWidgetState();
 }
 
-class _SurveyDetailWidgetState extends State<SurveyDetailWidget> {
+class SurveyDetailWidgetState extends State<SurveyDetailWidget> {
   List<AllSurvey>? allSurveys;
   bool isLoaded = false;
-  var idProvider = QuestionProvider();
   List<String>? questionIds;
 
   @override

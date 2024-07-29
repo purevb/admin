@@ -81,4 +81,33 @@ class AllSurveyRemoteService {
     }
     return false;
   }
+
+  Future<bool> updateAnswer(
+      String questionId, String id, Map<String, dynamic> updatedAnswer) async {
+    var client = http.Client();
+    var uri =
+        Uri.parse('http://localhost:3106/api/question/$questionId/answer/$id');
+    try {
+      var response = await client.put(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(updatedAnswer),
+      );
+
+      if (response.statusCode == 200) {
+        print('Answer updated successfully.');
+        return true;
+      } else {
+        print('Failed to update question. Status code: ${response.statusCode}');
+        print('Error response: ${response.body}');
+      }
+    } catch (e) {
+      print('Error updating question: $e');
+    } finally {
+      client.close();
+    }
+    return false;
+  }
 }

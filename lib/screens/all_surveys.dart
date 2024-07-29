@@ -1,15 +1,16 @@
+import 'package:admin/admin.dart';
 import 'package:admin/models/all_survey_model.dart';
-import 'package:admin/screens/survey_Details.dart';
+import 'package:admin/screens/survey_details.dart';
 import 'package:admin/services/all_survey.dart';
 import 'package:flutter/material.dart';
 
 class AllSurveys extends StatefulWidget {
-  AllSurveys({super.key});
+  const AllSurveys({super.key});
   @override
-  _AllSurveyWidgetState createState() => _AllSurveyWidgetState();
+  AllSurveyWidgetState createState() => AllSurveyWidgetState();
 }
 
-class _AllSurveyWidgetState extends State<AllSurveys> {
+class AllSurveyWidgetState extends State<AllSurveys> {
   bool isMandatory = false;
 
   List<AllSurvey>? allSurveys;
@@ -41,6 +42,27 @@ class _AllSurveyWidgetState extends State<AllSurveys> {
           "All surveys",
           style: TextStyle(color: Colors.white),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: Container(
+              color: const Color(0xff8146f6),
+              child: IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AdminDash(),
+                    ),
+                  );
+                },
+                tooltip: "Create Survey",
+                color: Colors.white,
+              ),
+            ),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -79,7 +101,7 @@ class _AllSurveyWidgetState extends State<AllSurveys> {
                                 children: [
                                   Text(
                                     "Survey Name: ${allSurveys![index].surveyName}",
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 20,
                                       fontStyle: FontStyle.italic,
                                     ),

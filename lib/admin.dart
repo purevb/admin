@@ -21,7 +21,7 @@ class _AdminDashState extends State<AdminDash> {
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
   int number = 1;
-  List<TextEditingController> _controllers = [];
+  final List<TextEditingController> _controllers = [];
   List<Widget> quests = [];
   bool active = false;
   String sName = '';
@@ -56,7 +56,7 @@ class _AdminDashState extends State<AdminDash> {
   Future<dynamic> postSurvey(Survey survey) async {
     final url = Uri.parse('http://localhost:3106/api/survey');
     final surveyJson = json.encode(survey.toJson());
-    print('Survey JSON: $surveyJson'); // Print survey data
+    print('Survey JSON: $surveyJson');
     final response = await http.post(
       url,
       headers: {
@@ -84,7 +84,7 @@ class _AdminDashState extends State<AdminDash> {
             "Admin Dashboard",
             style: TextStyle(color: Colors.white),
           ),
-          actions: <Widget>[
+          actions: const <Widget>[
             Placeholder(
               fallbackHeight: 30,
               fallbackWidth: 100,
@@ -104,11 +104,11 @@ class _AdminDashState extends State<AdminDash> {
         child: Form(
           key: _formKey,
           child: Padding(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   "Create Survey",
                   style: TextStyle(fontSize: 24),
                 ),

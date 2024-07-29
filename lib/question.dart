@@ -1,9 +1,7 @@
 import 'dart:convert';
-
-import 'package:admin/models/all_survey_model.dart';
 import 'package:admin/models/survey_model.dart';
 import 'package:admin/provider/question_provider.dart';
-import 'package:admin/screens/allSurveys.dart';
+import 'package:admin/screens/all_surveys.dart';
 import 'package:admin/services/question_type_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,31 +14,22 @@ class QuestionWidget extends StatefulWidget {
   final Survey survey;
   final String id;
 
-  QuestionWidget({Key? key, required this.survey, required this.id})
-      : super(key: key);
+  const QuestionWidget({super.key, required this.survey, required this.id});
 
   @override
-  _QuestionWidgetState createState() => _QuestionWidgetState();
+  QuestionWidgetState createState() => QuestionWidgetState();
 }
 
-class _QuestionWidgetState extends State<QuestionWidget> {
+class QuestionWidgetState extends State<QuestionWidget> {
   final _formKey = GlobalKey<FormState>();
   bool isMandatory = false;
-  int _selectedValue = 1;
   int number = 1;
-  final List<TextEditingController> _controllers = [];
-  final List<int> _values = [];
-  final List<bool> _isChecked = [];
   final List<String> ans = [];
-  final _questionController = TextEditingController();
-  final _textController = TextEditingController();
   String ques = '';
   List<QuestionType>? pastTypes;
   List<String> list = [];
   String? dropdownValue;
-
   var dataProvider = QuestionProvider();
-
   Future<void> postQuestion(List<QuestionModel?> question) async {
     final url = Uri.parse('http://localhost:3106/api/question');
     try {
@@ -110,11 +99,11 @@ class _QuestionWidgetState extends State<QuestionWidget> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => AllSurveys()));
             },
-            child: const Text("Surveys"),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xff333541),
               foregroundColor: Colors.white,
             ),
+            child: const Text("Surveys"),
           ),
           SizedBox(
             width: width * 0.2,
@@ -212,9 +201,9 @@ class _QuestionWidgetState extends State<QuestionWidget> {
             print('No questions to save.');
           }
         },
-        child: const Icon(Icons.save),
         backgroundColor: const Color(0xff15ae5c),
         tooltip: "Save all questions",
+        child: const Icon(Icons.save),
       ),
     );
   }
@@ -222,29 +211,29 @@ class _QuestionWidgetState extends State<QuestionWidget> {
 
 class SurveyDetails extends StatelessWidget {
   final Survey survey;
-  const SurveyDetails({Key? key, required this.survey}) : super(key: key);
+  const SurveyDetails({super.key, required this.survey});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(right: 2),
+      padding: const EdgeInsets.only(right: 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "Survey Name: ${survey.surveyName}",
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
           Text("Survey description: ${survey.surveyDescription}",
-              style: TextStyle(color: Colors.white)),
+              style: const TextStyle(color: Colors.white)),
           Text("Survey status: ${survey.surveyStatus}",
-              style: TextStyle(color: Colors.white)),
+              style: const TextStyle(color: Colors.white)),
           Text(
               "Survey start date: ${survey.surveyStartDate.toString().split(" ")[0]}",
-              style: TextStyle(color: Colors.white)),
+              style: const TextStyle(color: Colors.white)),
           Text(
               "Survey end date: ${survey.surveyEndDate.toString().split(' ')[0]}",
-              style: TextStyle(color: Colors.white)),
+              style: const TextStyle(color: Colors.white)),
         ],
       ),
     );

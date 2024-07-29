@@ -67,7 +67,6 @@ class _EditSurveyDetailWidgetState extends State<EditSurveyDetailWidget> {
 
   Future<void> updateSurveyAndQuestions() async {
     try {
-      // Update survey details
       final updatedSurvey = {
         "survey_name": surveyNameController.text,
         "survey_description": surveyDescriptionController.text,
@@ -79,44 +78,55 @@ class _EditSurveyDetailWidgetState extends State<EditSurveyDetailWidget> {
           await AllSurveyRemoteService().updateSurvey(widget.id, updatedSurvey);
 
       bool questionsUpdated = true;
+
       for (var editor in questionEditors) {
-        print(questionEditors.length);
-        print(editor.questionTextController.text);
         final updatedQuestion = {
           "question_text": editor.questionTextController.text,
         };
+
         final questionResponse = await AllSurveyRemoteService()
             .updateQuestion(editor.question.id, updatedQuestion);
+
         if (!questionResponse) {
           questionsUpdated = false;
         }
 
-        // for (var answerEditor in editor.answerEditors) {
-        //   final updatedAnswer = {
-        //     "answer_text": answerEditor.answerTextController.text,
-        //   };
-        //   // Ensure you have a correct method to update the answer
-        //   final answerResponse = await AllSurveyRemoteService()
-        //       .updater(answerEditor.answer.id, updatedAnswer);
-        //   if (!answerResponse) {
-        //     questionsUpdated = false;
-        //   }
-        // }
+        for (var answerEditor in editor.answerEditors) {
+          final updatedAnswer = {
+            "answer_text": answerEditor.answerTextController.text,
+          };
+
+          final answerResponse = await AllSurveyRemoteService().updateAnswer(
+            editor.question.id,
+            answerEditor.answer.id,
+            updatedAnswer,
+          );
+
+          if (!answerResponse) {
+            questionsUpdated = false;
+          }
+        }
       }
+
       if (surveyResponse && questionsUpdated) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Survey and questions updated successfully!')),
+            content: Text('Survey and questions updated successfully!'),
+          ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update survey or questions')),
+          const SnackBar(
+            content: Text('Failed to update survey or questions'),
+          ),
         );
       }
     } catch (e) {
       print('Error updating survey or questions: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update survey or questions')),
+        const SnackBar(
+          content: Text('Failed to update survey or questions'),
+        ),
       );
     }
   }
@@ -251,7 +261,7 @@ class QuestionEditor extends StatelessWidget {
   QuestionEditor({super.key, required this.question}) {
     questionTextController.text = question.questionText;
     answerEditors = question.answerText
-        .map((answer) => AnswerEditor(answer: answer))
+        .map((answer) => AnswerEditor(question: question, answer: answer))
         .toList();
   }
 
@@ -284,10 +294,11 @@ class QuestionEditor extends StatelessWidget {
 }
 
 class AnswerEditor extends StatelessWidget {
+  final Question question;
   final Answer answer;
   final TextEditingController answerTextController = TextEditingController();
 
-  AnswerEditor({super.key, required this.answer}) {
+  AnswerEditor({super.key, required this.question, required this.answer}) {
     answerTextController.text = answer.answerText;
   }
 

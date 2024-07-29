@@ -1,7 +1,4 @@
-// Dart side
 import 'dart:convert';
-
-import 'package:flutter/material.dart';
 
 class Answer {
   final String id;
@@ -14,8 +11,8 @@ class Answer {
 
   factory Answer.fromJson(Map<String, dynamic> json) {
     return Answer(
-      id: json['_id'],
-      answerText: json['answer_text'],
+      id: json['_id'] ?? '',
+      answerText: json['answer_text'] ?? '',
     );
   }
 
@@ -30,17 +27,21 @@ class Question {
   final String questionText;
   final List<Answer> answerText;
 
-  Question(
-      {required this.id, required this.questionText, required this.answerText});
+  Question({
+    required this.id,
+    required this.questionText,
+    required this.answerText,
+  });
 
   factory Question.fromJson(Map<String, dynamic> json) {
-    var answerFromJson = json['answer_text'] as List;
+    var answerFromJson = json['answer_text'] as List? ?? [];
     List<Answer> answerList =
         answerFromJson.map((answer) => Answer.fromJson(answer)).toList();
     return Question(
-        id: json['_id'],
-        questionText: json['question_text'],
-        answerText: answerList);
+      id: json['_id'] ?? '',
+      questionText: json['question_text'] ?? '',
+      answerText: answerList,
+    );
   }
 
   Map<String, dynamic> toJson() =>
@@ -67,18 +68,18 @@ class AllSurvey {
   });
 
   factory AllSurvey.fromJson(Map<String, dynamic> json) {
-    var questionFromJson = json['questions'] as List;
+    var questionFromJson = json['questions'] as List? ?? [];
     List<Question> questionList = questionFromJson
         .map((question) => Question.fromJson(question))
         .toList();
 
     return AllSurvey(
-      id: json['_id'],
-      surveyName: json['survey_name'],
-      surveyDescription: json['survey_description'],
+      id: json['_id'] ?? '',
+      surveyName: json['survey_name'] ?? '',
+      surveyDescription: json['survey_description'] ?? '',
       startDate: DateTime.parse(json['survey_start_date']),
       endDate: DateTime.parse(json['survey_end_date']),
-      surveyStatus: json['survey_status'],
+      surveyStatus: json['survey_status'] ?? false,
       question: questionList,
     );
   }
@@ -87,8 +88,8 @@ class AllSurvey {
         '_id': id,
         'survey_name': surveyName,
         'survey_description': surveyDescription,
-        'survey_start_date  ': startDate,
-        'survey_end_date': endDate,
+        'survey_start_date': startDate.toIso8601String(),
+        'survey_end_date': endDate.toIso8601String(),
         'survey_status': surveyStatus,
         'questions': question.map((q) => q.toJson()).toList(),
       };
