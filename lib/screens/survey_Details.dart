@@ -110,6 +110,11 @@ class SurveyDetailWidgetState extends State<SurveyDetailWidget> {
                                       'Survey Status: ${allSurveys![index].surveyStatus ? 'Active' : 'Inactive'}',
                                       style: const TextStyle(
                                           fontStyle: FontStyle.italic)),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                      'Image Url: ${allSurveys![index].imgUrl}',
+                                      style: const TextStyle(
+                                          fontStyle: FontStyle.italic)),
                                 ],
                               ),
                             ),

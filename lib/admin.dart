@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'models/survey_model.dart';
 import 'question.dart';
 
-final _formKey = GlobalKey<FormState>();
+final _adminFormKey = GlobalKey<FormState>();
 
 class AdminDash extends StatefulWidget {
   const AdminDash({super.key});
@@ -18,6 +18,7 @@ class _AdminDashState extends State<AdminDash> {
   final _descriptionController = TextEditingController();
   final _startDateController = TextEditingController();
   final _endDateController = TextEditingController();
+  final _urlController = TextEditingController();
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
   int number = 1;
@@ -28,22 +29,11 @@ class _AdminDashState extends State<AdminDash> {
   String sDesc = '';
   String sDate = '';
   String eDate = '';
+  String imgUrl = '';
   @override
   void initState() {
     super.initState();
     _controllers.add(TextEditingController(text: "Option $number"));
-    getData();
-  }
-
-  List<Survey>? pastSurveys;
-  var isLoaded = false;
-  Future<void> getData() async {
-    pastSurveys = await SurveyRemoteService().getSurvey();
-    if (pastSurveys != null && pastSurveys!.isNotEmpty) {
-      setState(() {
-        isLoaded = true;
-      });
-    }
   }
 
   void addOptions() {
@@ -102,7 +92,7 @@ class _AdminDashState extends State<AdminDash> {
           ]),
       body: SingleChildScrollView(
         child: Form(
-          key: _formKey,
+          key: _adminFormKey,
           child: Padding(
             padding: const EdgeInsets.all(10),
             child: Column(
@@ -203,6 +193,23 @@ class _AdminDashState extends State<AdminDash> {
                             date!.isEmpty ? "End date is required" : null,
                       ),
                       SizedBox(
+                        height: 20,
+                      ),
+                      TextFormField(
+                        controller: _urlController,
+                        onChanged: (value) {
+                          setState(() {
+                            imgUrl = value;
+                          });
+                        },
+                        decoration: const InputDecoration(
+                          labelText: "Image Url",
+                          border: OutlineInputBorder(),
+                        ),
+                        // validator: (url) =>
+                        //     name!.isEmpty ? "Survey name is required" : null,
+                      ),
+                      SizedBox(
                         height: height * 0.035,
                       ),
                       Row(
@@ -210,19 +217,19 @@ class _AdminDashState extends State<AdminDash> {
                         children: [
                           ElevatedButton(
                             onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
+                              if (_adminFormKey.currentState!.validate()) {
                                 bool isActive = selectedEndDate != null &&
                                     selectedEndDate!.isAfter(DateTime.now());
 
                                 if (selectedStartDate != null &&
                                     selectedEndDate != null) {
                                   final survey = Survey(
-                                    surveyName: sName,
-                                    surveyDescription: sDesc,
-                                    surveyStartDate: selectedStartDate!,
-                                    surveyEndDate: selectedEndDate!,
-                                    surveyStatus: isActive,
-                                  );
+                                      surveyName: sName,
+                                      surveyDescription: sDesc,
+                                      surveyStartDate: selectedStartDate!,
+                                      surveyEndDate: selectedEndDate!,
+                                      surveyStatus: isActive,
+                                      imgUrl: imgUrl);
                                   print('Survey to post: ${survey.toJson()}');
                                   var res = await postSurvey(survey);
                                   print(res["data"]["_id"]);

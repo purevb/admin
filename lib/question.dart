@@ -21,7 +21,7 @@ class QuestionWidget extends StatefulWidget {
 }
 
 class QuestionWidgetState extends State<QuestionWidget> {
-  final _formKey = GlobalKey<FormState>();
+  final _questionFormKey = GlobalKey<FormState>();
   bool isMandatory = false;
   int number = 1;
   final List<String> ans = [];
@@ -140,7 +140,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
         ],
       ),
       body: Form(
-        key: _formKey,
+        key: _questionFormKey,
         child: Row(
           children: [
             Container(

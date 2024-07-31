@@ -55,17 +55,19 @@ class AllSurvey {
   final DateTime startDate;
   final DateTime endDate;
   final bool surveyStatus;
+  final String imgUrl;
+
   final List<Question> question;
 
-  AllSurvey({
-    required this.id,
-    required this.surveyName,
-    required this.surveyDescription,
-    required this.startDate,
-    required this.endDate,
-    required this.surveyStatus,
-    required this.question,
-  });
+  AllSurvey(
+      {required this.id,
+      required this.surveyName,
+      required this.surveyDescription,
+      required this.startDate,
+      required this.endDate,
+      required this.surveyStatus,
+      required this.question,
+      required this.imgUrl});
 
   factory AllSurvey.fromJson(Map<String, dynamic> json) {
     var questionFromJson = json['questions'] as List? ?? [];
@@ -80,6 +82,7 @@ class AllSurvey {
       startDate: DateTime.parse(json['survey_start_date']),
       endDate: DateTime.parse(json['survey_end_date']),
       surveyStatus: json['survey_status'] ?? false,
+      imgUrl: json['img_url'],
       question: questionList,
     );
   }
@@ -91,6 +94,7 @@ class AllSurvey {
         'survey_start_date': startDate.toIso8601String(),
         'survey_end_date': endDate.toIso8601String(),
         'survey_status': surveyStatus,
+        'img_url': imgUrl,
         'questions': question.map((q) => q.toJson()).toList(),
       };
 }

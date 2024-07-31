@@ -1,9 +1,11 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:admin/models/all_survey_model.dart';
-import 'package:admin/models/question_model.dart';
+import 'package:admin/models/survey_model.dart';
 import 'package:admin/provider/question_provider.dart';
+import 'package:admin/services/question_service.dart';
 import 'package:admin/services/question_type_service.dart';
+import 'package:admin/services/survey_services.dart';
+import 'package:http/http.dart' as http;
+import 'package:admin/models/question_model.dart';
 import 'package:admin/models/question_type_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,41 +14,53 @@ class QuestWidget extends StatefulWidget {
   final String id;
 
   const QuestWidget({
-    super.key,
+    Key? key,
     required this.id,
-  });
+  }) : super(key: key);
 
   @override
-  QuestWidgetState createState() => QuestWidgetState();
+  _QuestWidgetState createState() => _QuestWidgetState();
 }
 
-class QuestWidgetState extends State<QuestWidget> {
+class _QuestWidgetState extends State<QuestWidget> {
   bool isMandatory = false;
   int _selectedValue = 1;
   int number = 1;
+  var dataProvider = QuestionProvider();
   final List<TextEditingController> _controllers = [];
   final List<int> _values = [];
   final List<bool> _isChecked = [];
-  final List<String> ans = [];
+  List<Widget> quests = [];
   final _questionController = TextEditingController();
   final _textController = TextEditingController();
   String ques = '';
+  List<String> ans = [];
+  var isLoaded = false;
   List<QuestionType>? pastTypes;
+  List<QuestionModel>? pastQuestions;
   List<String> list = [];
   String? dropdownValue;
+  int urt = 0;
+
+  List<QuestionModel>? asuult = [];
 
   @override
   void initState() {
     super.initState();
-    getQuestionTypeData();
+    getData();
   }
 
-  Future<void> getQuestionTypeData() async {
+  Future<void> getData() async {
     try {
       pastTypes = await TypesRemoteService().getType();
+      pastQuestions = await QuestionRemoteService().getQuestion();
       setState(() {
+        isLoaded = true;
         if (pastTypes != null && pastTypes!.isNotEmpty) {
-          list = pastTypes!.map((type) => type.questionType).toList();
+          list = List.generate(
+            pastTypes!.length,
+            (index) => pastTypes![index].questionType,
+          );
           dropdownValue = list.isNotEmpty ? list.first : null;
         } else {
           dropdownValue = null;
@@ -54,6 +68,9 @@ class QuestWidgetState extends State<QuestWidget> {
       });
     } catch (e) {
       print('Error fetching data: $e');
+      setState(() {
+        isLoaded = false;
+      });
     }
   }
 
@@ -87,6 +104,8 @@ class QuestWidgetState extends State<QuestWidget> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -273,25 +292,27 @@ class QuestWidgetState extends State<QuestWidget> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Radio(
-                          value: 50,
-                          groupValue: _selectedValue,
-                          onChanged: (int? value) {
-                            setState(() {
-                              _selectedValue = value!;
-                            });
-                          },
-                        ),
-                        const Text(
-                          "Add option",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
+                    Container(
+                      child: Row(
+                        children: [
+                          Radio(
+                            value: 50,
+                            groupValue: _selectedValue,
+                            onChanged: (int? value) {
+                              setState(() {
+                                _selectedValue = value!;
+                              });
+                            },
                           ),
-                        ),
-                      ],
+                          const Text(
+                            "Add option",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -321,57 +342,63 @@ class QuestWidgetState extends State<QuestWidget> {
                 thickness: 5,
               ),
               SizedBox(
-                child: Row(
-                  children: [
-                    Row(
-                      children: [
-                        const Text(
-                          "Required",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Checkbox(
-                          value: isMandatory,
-                          activeColor: Colors.black.withOpacity(0.6),
-                          onChanged: (value) {
-                            setState(() {
-                              isMandatory = value!;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        QuestionModel? question;
-                        List<AnswerModel> answers =
-                            ans.map((e) => AnswerModel(answerText: e)).toList();
-                        for (var type in pastTypes!) {
-                          if (dropdownValue == type.questionType) {
-                            question = QuestionModel(
-                              surveyID: widget.id,
-                              questionsTypeID: type.id ?? "",
-                              questionText: ques,
-                              isMandatory: isMandatory,
-                            );
-                            break;
-                          }
-                        }
-                        if (question != null) {
-                          postQuestion(question);
-                        } else {
-                          print('Question type taarsngu.');
-                        }
-                      },
-                      child: const Text("Save"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black.withOpacity(0.5),
-                        foregroundColor: Colors.white,
+                child: Container(
+                  child: Row(
+                    children: [
+                      Row(
+                        children: [
+                          const Text(
+                            "Required",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Checkbox(
+                            value: isMandatory,
+                            activeColor: Colors.black.withOpacity(0.6),
+                            onChanged: (value) {
+                              setState(() {
+                                isMandatory = value!;
+                              });
+                            },
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          QuestionModel? question;
+                          List<AnswerModel> answers = ans
+                              .map((e) => AnswerModel(answerText: e))
+                              .toList();
+                          for (var type in pastTypes!) {
+                            if (dropdownValue == type.questionType) {
+                              // dataProvider.quests.add();
+
+                              question = QuestionModel(
+                                surveyID: widget.id,
+                                questionsTypeID: type.id ?? "",
+                                questionText: ques,
+                                isMandatory: isMandatory,
+                                answers: answers,
+                              );
+                              break;
+                            }
+                          }
+                          if (question != null) {
+                            postQuestion(question);
+                          } else {
+                            print('Question type taarsngu.');
+                          }
+                        },
+                        child: const Text("Save"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black.withOpacity(0.5),
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

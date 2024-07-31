@@ -23,6 +23,7 @@ class _EditSurveyDetailWidgetState extends State<EditSurveyDetailWidget> {
   final TextEditingController surveyStartDayController =
       TextEditingController();
   final TextEditingController surveyEndDayController = TextEditingController();
+  final TextEditingController imgUrlController = TextEditingController();
   late List<QuestionEditor> questionEditors;
 
   @override
@@ -54,6 +55,7 @@ class _EditSurveyDetailWidgetState extends State<EditSurveyDetailWidget> {
           surveyDescriptionController.text = currentSurvey.surveyDescription;
           surveyStartDayController.text = currentSurvey.startDate.toString();
           surveyEndDayController.text = currentSurvey.endDate.toString();
+          imgUrlController.text = currentSurvey.imgUrl;
 
           questionEditors = currentSurvey.question
               .map((question) => QuestionEditor(question: question))
@@ -72,6 +74,7 @@ class _EditSurveyDetailWidgetState extends State<EditSurveyDetailWidget> {
         "survey_description": surveyDescriptionController.text,
         "survey_start_date": surveyStartDayController.text,
         "survey_end_date": surveyEndDayController.text,
+        "img_url": imgUrlController.text
       };
 
       final surveyResponse =
@@ -171,7 +174,14 @@ class _EditSurveyDetailWidgetState extends State<EditSurveyDetailWidget> {
                               decoration: const InputDecoration(
                                   labelText: 'Survey Description'),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 8),
+                            TextFormField(
+                              controller: imgUrlController,
+                              decoration: const InputDecoration(
+                                labelText: "Image Url",
+                              ),
+                            ),
+                            const SizedBox(height: 8),
                             const Text('Survey Questions:',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
