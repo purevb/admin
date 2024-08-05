@@ -5,10 +5,10 @@ import 'package:admin/services/all_survey.dart';
 class EditSurveyDetailWidget extends StatefulWidget {
   final String id;
 
-  EditSurveyDetailWidget({
-    Key? key,
+  const EditSurveyDetailWidget({
+    super.key,
     required this.id,
-  }) : super(key: key);
+  });
 
   @override
   _EditSurveyDetailWidgetState createState() => _EditSurveyDetailWidgetState();

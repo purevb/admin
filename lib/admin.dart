@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:admin/services/survey_services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'models/survey_model.dart';
@@ -192,7 +191,7 @@ class _AdminDashState extends State<AdminDash> {
                         validator: (date) =>
                             date!.isEmpty ? "End date is required" : null,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       TextFormField(
@@ -206,8 +205,8 @@ class _AdminDashState extends State<AdminDash> {
                           labelText: "Image Url",
                           border: OutlineInputBorder(),
                         ),
-                        // validator: (url) =>
-                        //     name!.isEmpty ? "Survey name is required" : null,
+                        validator: (url) =>
+                            url!.isEmpty ? "url is required" : null,
                       ),
                       SizedBox(
                         height: height * 0.035,

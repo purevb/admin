@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'package:admin/models/survey_model.dart';
 import 'package:admin/provider/question_provider.dart';
 import 'package:admin/services/question_service.dart';
 import 'package:admin/services/question_type_service.dart';
-import 'package:admin/services/survey_services.dart';
 import 'package:http/http.dart' as http;
 import 'package:admin/models/question_model.dart';
 import 'package:admin/models/question_type_model.dart';
@@ -14,15 +12,15 @@ class QuestWidget extends StatefulWidget {
   final String id;
 
   const QuestWidget({
-    Key? key,
+    super.key,
     required this.id,
-  }) : super(key: key);
+  });
 
   @override
-  _QuestWidgetState createState() => _QuestWidgetState();
+  QuestWidgetState createState() => QuestWidgetState();
 }
 
-class _QuestWidgetState extends State<QuestWidget> {
+class QuestWidgetState extends State<QuestWidget> {
   bool isMandatory = false;
   int _selectedValue = 1;
   int number = 1;
@@ -104,8 +102,6 @@ class _QuestWidgetState extends State<QuestWidget> {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -292,27 +288,25 @@ class _QuestWidgetState extends State<QuestWidget> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      child: Row(
-                        children: [
-                          Radio(
-                            value: 50,
-                            groupValue: _selectedValue,
-                            onChanged: (int? value) {
-                              setState(() {
-                                _selectedValue = value!;
-                              });
-                            },
+                    Row(
+                      children: [
+                        Radio(
+                          value: 50,
+                          groupValue: _selectedValue,
+                          onChanged: (int? value) {
+                            setState(() {
+                              _selectedValue = value!;
+                            });
+                          },
+                        ),
+                        const Text(
+                          "Add option",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
                           ),
-                          const Text(
-                            "Add option",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -342,63 +336,60 @@ class _QuestWidgetState extends State<QuestWidget> {
                 thickness: 5,
               ),
               SizedBox(
-                child: Container(
-                  child: Row(
-                    children: [
-                      Row(
-                        children: [
-                          const Text(
-                            "Required",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Checkbox(
-                            value: isMandatory,
-                            activeColor: Colors.black.withOpacity(0.6),
-                            onChanged: (value) {
-                              setState(() {
-                                isMandatory = value!;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          QuestionModel? question;
-                          List<AnswerModel> answers = ans
-                              .map((e) => AnswerModel(answerText: e))
-                              .toList();
-                          for (var type in pastTypes!) {
-                            if (dropdownValue == type.questionType) {
-                              // dataProvider.quests.add();
-
-                              question = QuestionModel(
-                                surveyID: widget.id,
-                                questionsTypeID: type.id ?? "",
-                                questionText: ques,
-                                isMandatory: isMandatory,
-                                answers: answers,
-                              );
-                              break;
-                            }
-                          }
-                          if (question != null) {
-                            postQuestion(question);
-                          } else {
-                            print('Question type taarsngu.');
-                          }
-                        },
-                        child: const Text("Save"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black.withOpacity(0.5),
-                          foregroundColor: Colors.white,
+                child: Row(
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          "Required",
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
+                        Checkbox(
+                          value: isMandatory,
+                          activeColor: Colors.black.withOpacity(0.6),
+                          onChanged: (value) {
+                            setState(() {
+                              isMandatory = value!;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        QuestionModel? question;
+                        List<AnswerModel> answers =
+                            ans.map((e) => AnswerModel(answerText: e)).toList();
+                        for (var type in pastTypes!) {
+                          if (dropdownValue == type.questionType) {
+                            // dataProvider.quests.add();
+
+                            question = QuestionModel(
+                              surveyID: widget.id,
+                              questionsTypeID: type.id ?? "",
+                              questionText: ques,
+                              isMandatory: isMandatory,
+                              answers: answers,
+                            );
+                            break;
+                          }
+                        }
+                        if (question != null) {
+                          postQuestion(question);
+                        } else {
+                          print('Question type taarsngu.');
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black.withOpacity(0.5),
+                        foregroundColor: Colors.white,
                       ),
-                    ],
-                  ),
+                      child: const Text("Save"),
+                    ),
+                  ],
                 ),
               ),
             ],

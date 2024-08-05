@@ -97,7 +97,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
           ElevatedButton(
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AllSurveys()));
+                  MaterialPageRoute(builder: (context) => const AllSurveys()));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xff333541),
@@ -173,34 +173,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (ques.isEmpty) {
-            print('Question text is empty.');
-            return;
-          }
-          List<AnswerModel> answers =
-              ans.map((e) => AnswerModel(answerText: e)).toList();
-          for (var type in pastTypes!) {
-            if (dropdownValue == type.questionType) {
-              dataProvider.addQuestionData(
-                QuestionModel(
-                  surveyID: widget.id,
-                  questionsTypeID: type.id ?? "",
-                  questionText: ques,
-                  isMandatory: isMandatory,
-                  answers: answers,
-                ),
-              );
-              break;
-            }
-          }
-          debugPrintQuestions();
-          if (dataProvider.questions.isNotEmpty) {
-            postQuestion(dataProvider.questions);
-          } else {
-            print('No questions to save.');
-          }
-        },
+        onPressed: () {},
         backgroundColor: const Color(0xff15ae5c),
         tooltip: "Save all questions",
         child: const Icon(Icons.save),
