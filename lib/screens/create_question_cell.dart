@@ -82,23 +82,22 @@ class QuestWidgetState extends State<QuestWidget> {
     });
   }
 
-  Future<void> postQuestion(QuestionModel question) async {
-    final url = Uri.parse('http://localhost:3106/api/question');
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode(question.toJson()),
-    );
-
-    if (response.statusCode == 200) {
-      print('Question saved successfully');
-    } else {
-      print('Failed to save question');
-      print(response.body);
-    }
-  }
+  // Future<void> postQuestion(QuestionModel question) async {
+  //   final url = Uri.parse('http://localhost:3106/api/question');
+  //   final response = await http.post(
+  //     url,
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: json.encode(question.toJson()),
+  //   );
+  //   if (response.statusCode == 200) {
+  //     print('Question saved successfully');
+  //   } else {
+  //     print('Failed to save question');
+  //     print(response.body);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -357,37 +356,38 @@ class QuestWidgetState extends State<QuestWidget> {
                     ),
                     const SizedBox(
                       width: 5,
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        QuestionModel? question;
-                        List<AnswerModel> answers =
-                            ans.map((e) => AnswerModel(answerText: e)).toList();
-                        for (var type in pastTypes!) {
-                          if (dropdownValue == type.questionType) {
-                            // dataProvider.quests.add();
+                      // ),
+                      // ElevatedButton(
+                      //   onPressed: () {
+                      //     QuestionModel? question;
+                      //     List<AnswerModel> answers =
+                      //         ans.map((e) => AnswerModel(answerText: e)).toList();
+                      //     for (var type in pastTypes!) {
+                      //       if (dropdownValue == type.questionType) {
+                      //         // dataProvider.quests.add();
 
-                            question = QuestionModel(
-                              surveyID: widget.id,
-                              questionsTypeID: type.id ?? "",
-                              questionText: ques,
-                              isMandatory: isMandatory,
-                              answers: answers,
-                            );
-                            break;
-                          }
-                        }
-                        if (question != null) {
-                          postQuestion(question);
-                        } else {
-                          print('Question type taarsngu.');
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black.withOpacity(0.5),
-                        foregroundColor: Colors.white,
-                      ),
-                      child: const Text("Save"),
+                      //         question = QuestionModel(
+                      //           surveyID: widget.id,
+                      //           questionsTypeID: type.id ?? "",
+                      //           questionText: ques,
+                      //           isMandatory: isMandatory,
+                      //           answers: answers,
+                      //         );
+                      //         break;
+                      //       }
+                      //     }
+                      //     if (question != null) {
+                      //       postQuestion(question);
+                      //     } else {
+                      //       print('Question type taarsngu.');
+                      //     }
+                      //   },
+                      //   style: ElevatedButton.styleFrom(
+                      //     backgroundColor: Colors.black.withOpacity(0.5),
+                      //     foregroundColor: Colors.white,
+                      //   ),
+                      //   child: const Text("Save"),
+                      // ),
                     ),
                   ],
                 ),

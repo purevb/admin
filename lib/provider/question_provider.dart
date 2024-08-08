@@ -28,4 +28,6 @@ class QuestionProvider extends ChangeNotifier {
     quests.remove(widget);
     notifyListeners();
   }
+
+  List<QuestionModel?> get allQuestions => questions;
 }

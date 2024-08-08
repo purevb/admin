@@ -29,9 +29,11 @@ class QuestionWidgetState extends State<QuestionWidget> {
   List<QuestionType>? pastTypes;
   List<String> list = [];
   String? dropdownValue;
+
   var dataProvider = QuestionProvider();
+
   Future<void> postQuestion(List<QuestionModel?> question) async {
-    final url = Uri.parse('http://localhost:3106/api/question');
+    final url = Uri.parse('http://localhost:3106/api/questions');
     try {
       final response = await http.post(
         url,
@@ -173,7 +175,9 @@ class QuestionWidgetState extends State<QuestionWidget> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          // postQuestion()
+        },
         backgroundColor: const Color(0xff15ae5c),
         tooltip: "Save all questions",
         child: const Icon(Icons.save),
