@@ -2,7 +2,8 @@ import 'package:admin/models/question_model.dart';
 import 'package:flutter/material.dart';
 
 class QuestionProvider extends ChangeNotifier {
-  final List<Widget> quests = [];
+  final List<QuestionModel> quests = [];
+
   final List<QuestionModel?> questions = [];
   final List<String> answerID = [];
 
@@ -22,13 +23,13 @@ class QuestionProvider extends ChangeNotifier {
     }
   }
 
-  void addQuestion(Widget widget) {
-    quests.add(widget);
+  void addQuestion(QuestionModel question) {
+    quests.add(question);
     notifyListeners();
   }
 
-  void removeQuestion(Widget widget) {
-    quests.remove(widget);
+  void removeQuestion(QuestionModel question) {
+    quests.remove(question);
     notifyListeners();
   }
 

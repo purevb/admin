@@ -20,17 +20,17 @@ class AnswerModel {
 
 class QuestionModel {
   final String surveyID;
-  final String questionsTypeID;
-  final String questionText;
+  final String? questionsTypeID;
+  final String? questionText;
   final List<AnswerModel>? answers;
-  final bool isMandatory;
+  final bool? isMandatory;
 
   QuestionModel({
     required this.surveyID,
-    required this.questionsTypeID,
-    required this.questionText,
-    required this.answers,
-    required this.isMandatory,
+    this.questionsTypeID,
+    this.questionText,
+    this.answers,
+    this.isMandatory,
   });
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) {

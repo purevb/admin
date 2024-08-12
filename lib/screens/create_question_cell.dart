@@ -109,13 +109,14 @@ class QuestWidgetState extends State<QuestWidget> {
       if (dropdownValue == type.questionType) {
         return QuestionModel(
           surveyID: widget.id,
-          questionsTypeID: type.id ?? "",
+          questionsTypeID: dropdownValue!,
           questionText: ques,
           isMandatory: isMandatory,
           answers: answers,
         );
       }
     }
+    print(dropdownValue);
     return null;
   }
 
@@ -175,6 +176,9 @@ class QuestWidgetState extends State<QuestWidget> {
                 onChanged: (String? value) {
                   setState(() {
                     dropdownValue = value!;
+                    // if (pastTypes[index].questionType == value!) {
+                    //   dropdownValue = pastTypes[index].id;
+                    // }
                   });
                 },
               ),
@@ -343,8 +347,8 @@ class QuestWidgetState extends State<QuestWidget> {
                 ),
                 IconButton(
                   onPressed: () {
-                    Provider.of<QuestionProvider>(context, listen: false)
-                        .removeQuestion(widget);
+                    // Provider.of<QuestionProvider>(context, listen: false)
+                    //     .removeQuestion(widget);
                   },
                   icon: const Icon(Icons.delete_outline),
                 ),
