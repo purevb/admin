@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:admin/models/question_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -19,5 +21,32 @@ class QuestionRemoteService {
       clientls.close();
     }
     return null;
+  }
+
+  Future<bool> deleteQuestion(String id) async {
+    var client = http.Client();
+    var uri = Uri.parse('http://localhost:3106/api/question/$id');
+
+    try {
+      var response = await client.delete(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Question deleted successfully.');
+        return true;
+      } else {
+        print('Failed to delete question. Status code: ${response.statusCode}');
+        print('Error response: ${response.body}');
+      }
+    } catch (e) {
+      print('Error deleting question: $e');
+    } finally {
+      client.close();
+    }
+    return false;
   }
 }

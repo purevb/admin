@@ -110,4 +110,31 @@ class AllSurveyRemoteService {
     }
     return false;
   }
+
+  Future<bool> deleteSurvey(String id) async {
+    var client = http.Client();
+    var uri = Uri.parse('http://localhost:3106/api/survey/$id');
+
+    try {
+      var response = await client.delete(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('survey deleted successfully.');
+        return true;
+      } else {
+        print('Failed to delete survey. Status code: ${response.statusCode}');
+        print('Error response: ${response.body}');
+      }
+    } catch (e) {
+      print('Error deleting survey: $e');
+    } finally {
+      client.close();
+    }
+    return false;
+  }
 }

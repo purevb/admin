@@ -2,21 +2,24 @@ import 'package:admin/models/question_model.dart';
 import 'package:flutter/material.dart';
 
 class QuestionProvider extends ChangeNotifier {
-  List<Widget> quests = [];
-  List<QuestionModel?> questions = [];
-  List<String> answerID = [];
-  // List<String> typeID = [];
+  final List<Widget> quests = [];
+  final List<QuestionModel?> questions = [];
+  final List<String> answerID = [];
 
   void addAnswerIdData(String id) {
     answerID.add(id);
-    print('Added question: ${id}');
+    print('Added answer ID: $id');
     notifyListeners();
   }
 
-  void addQuestionData(QuestionModel question) {
-    questions.add(question);
-    print('Added question: ${question.toJson()}');
-    notifyListeners();
+  void addQuestionData(QuestionModel? question) {
+    if (question != null) {
+      questions.add(question);
+      print('Added question: ${question.toJson()}');
+      notifyListeners();
+    } else {
+      print('Attempted to add null question');
+    }
   }
 
   void addQuestion(Widget widget) {

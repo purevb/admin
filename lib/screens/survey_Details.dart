@@ -1,7 +1,11 @@
+import 'package:admin/provider/question_provider.dart';
+import 'package:admin/screens/create_question_cell.dart';
 import 'package:admin/screens/edit_survey_details.dart';
+import 'package:admin/services/question_service.dart';
 import 'package:flutter/material.dart';
 import 'package:admin/models/all_survey_model.dart';
 import 'package:admin/services/all_survey.dart';
+import 'package:provider/provider.dart';
 
 class SurveyDetailWidget extends StatefulWidget {
   final String id;
@@ -14,7 +18,26 @@ class SurveyDetailWidget extends StatefulWidget {
 class SurveyDetailWidgetState extends State<SurveyDetailWidget> {
   List<AllSurvey>? allSurveys;
   bool isLoaded = false;
-  List<String>? questionIds;
+
+  Future<void> removeQuestions(String questionId) async {
+    try {
+      await QuestionRemoteService().deleteQuestion(questionId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Question deleted successfully'),
+        ),
+      );
+
+      getData();
+    } catch (e) {
+      print('Error deleting question: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to delete question'),
+        ),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -59,6 +82,18 @@ class SurveyDetailWidgetState extends State<SurveyDetailWidget> {
             },
             icon: const Icon(Icons.edit),
           ),
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: Container(
+              color: const Color(0xff8146f6),
+              child: IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {},
+                tooltip: "Create question",
+                color: Colors.white,
+              ),
+            ),
+          )
         ],
       ),
       body: isLoaded
@@ -81,7 +116,6 @@ class SurveyDetailWidgetState extends State<SurveyDetailWidget> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    // questionIds.toString(),
                                     'Survey Name: ${allSurveys![index].surveyName}',
                                     style: const TextStyle(
                                         fontStyle: FontStyle.italic,
@@ -141,11 +175,41 @@ class SurveyDetailWidgetState extends State<SurveyDetailWidget> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          question.questionText,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontStyle: FontStyle.italic),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 6.0, horizontal: 6.0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  const Text(
+                                                    "Question:",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  const SizedBox(width: 5),
+                                                  Text(
+                                                    question.questionText,
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15),
+                                                  ),
+                                                ],
+                                              ),
+                                              IconButton(
+                                                  tooltip: "Delete question",
+                                                  onPressed: () {
+                                                    removeQuestions(
+                                                        question.id);
+                                                  },
+                                                  icon:
+                                                      const Icon(Icons.delete))
+                                            ],
+                                          ),
                                         ),
                                         const SizedBox(height: 4),
                                         Column(
@@ -153,10 +217,18 @@ class SurveyDetailWidgetState extends State<SurveyDetailWidget> {
                                               CrossAxisAlignment.start,
                                           children:
                                               question.answerText.map((answer) {
-                                            return Text(
-                                              answer.answerText,
-                                              style: const TextStyle(
-                                                  fontStyle: FontStyle.italic),
+                                            return ListTile(
+                                              shape: RoundedRectangleBorder(
+                                                side: BorderSide(
+                                                    color: Colors.black
+                                                        .withOpacity(0.2),
+                                                    width: 1),
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                              title: Text(
+                                                answer.answerText,
+                                              ),
                                             );
                                           }).toList(),
                                         ),

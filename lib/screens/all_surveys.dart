@@ -31,6 +31,21 @@ class AllSurveyWidgetState extends State<AllSurveys> {
     }
   }
 
+  Future<void> deleteSurvey(String id) async {
+    try {
+      await AllSurveyRemoteService().deleteSurvey(id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Survey deleted succesfully')),
+      );
+      getData();
+    } catch (e) {
+      print('Error deleting survey');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to delet Survey')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,26 +105,40 @@ class AllSurveyWidgetState extends State<AllSurveys> {
                             ),
                           );
                         },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Container(
-                            color: Colors.black.withOpacity(0.5),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Survey Name: ${allSurveys![index].surveyName}",
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontStyle: FontStyle.italic,
-                                    ),
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                color: Colors.black.withOpacity(0.5),
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Survey Name: ${allSurveys![index].surveyName}",
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                      // Text("${allSurveys![index].id}")
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
+                            Positioned(
+                                right: 0,
+                                bottom: 0,
+                                child: IconButton(
+                                    onPressed: () {
+                                      deleteSurvey(allSurveys![index].id);
+                                    },
+                                    icon: const Icon(Icons.delete_forever)))
+                          ],
                         ),
                       );
                     },

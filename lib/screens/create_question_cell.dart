@@ -82,22 +82,42 @@ class QuestWidgetState extends State<QuestWidget> {
     });
   }
 
-  // Future<void> postQuestion(QuestionModel question) async {
-  //   final url = Uri.parse('http://localhost:3106/api/question');
-  //   final response = await http.post(
-  //     url,
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: json.encode(question.toJson()),
-  //   );
-  //   if (response.statusCode == 200) {
-  //     print('Question saved successfully');
-  //   } else {
-  //     print('Failed to save question');
-  //     print(response.body);
-  //   }
-  // }
+  Future<void> postQuestion(QuestionModel question) async {
+    final url = Uri.parse('http://localhost:3106/api/question');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(question.toJson()),
+    );
+    if (response.statusCode == 200) {
+      print('Question saved successfully');
+    } else {
+      print('Failed to save question');
+      print(response.body);
+    }
+  }
+
+  QuestionModel? getQuestionModel() {
+    if (ques.isEmpty || dropdownValue == null) {
+      return null;
+    }
+    List<AnswerModel> answers =
+        ans.map((e) => AnswerModel(answerText: e)).toList();
+    for (var type in pastTypes!) {
+      if (dropdownValue == type.questionType) {
+        return QuestionModel(
+          surveyID: widget.id,
+          questionsTypeID: type.id ?? "",
+          questionText: ques,
+          isMandatory: isMandatory,
+          answers: answers,
+        );
+      }
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,140 +128,188 @@ class QuestWidgetState extends State<QuestWidget> {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(),
       ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  color: Colors.grey.withOpacity(0.08),
-                  child: TextFormField(
-                    controller: _questionController,
-                    decoration: const InputDecoration(
-                      contentPadding: EdgeInsets.only(left: 10),
-                      labelText: "Асуулт",
-                      labelStyle: TextStyle(color: Colors.grey),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        ques = value;
-                      });
-                    },
+      child: Column(children: [
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                color: Colors.grey.withOpacity(0.08),
+                child: TextFormField(
+                  controller: _questionController,
+                  decoration: const InputDecoration(
+                    contentPadding: EdgeInsets.only(left: 10),
+                    labelText: "Асуулт",
+                    labelStyle: TextStyle(color: Colors.grey),
                   ),
-                ),
-              ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.image_outlined,
-                  size: 30,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.only(left: 5, right: 5),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: DropdownButton<String>(
-                  value: dropdownValue,
-                  icon: const Icon(Icons.arrow_drop_down),
-                  elevation: 16,
-                  items: list.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value.toString()),
-                    );
-                  }).toList(),
-                  onChanged: (String? value) {
+                  onChanged: (value) {
                     setState(() {
-                      dropdownValue = value!;
+                      ques = value;
                     });
                   },
                 ),
               ),
-            ],
-          ),
-          Column(
-            children: List.generate(_controllers.length, (index) {
-              if (dropdownValue == "Multiple Choice") {
-                return Container(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Checkbox(
-                        value: _isChecked[index],
-                        activeColor: Colors.black.withOpacity(0.5),
-                        onChanged: (bool? value) {
-                          setState(() {
-                            _isChecked[index] = value!;
-                          });
-                        },
-                      ),
-                      Expanded(
-                        child: TextField(
-                          controller: _controllers[index],
-                          decoration: const InputDecoration(
-                            enabledBorder: InputBorder.none,
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              ans[index] = value;
-                            });
-                          },
+            ),
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.image_outlined,
+                size: 30,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: DropdownButton<String>(
+                value: dropdownValue,
+                icon: const Icon(Icons.arrow_drop_down),
+                elevation: 16,
+                items: list.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value.toString()),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  setState(() {
+                    dropdownValue = value!;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+        Column(
+          children: List.generate(_controllers.length, (index) {
+            if (dropdownValue == "Multiple Choice") {
+              return Container(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: _isChecked[index],
+                      activeColor: Colors.black.withOpacity(0.5),
+                      onChanged: (bool? value) {
+                        setState(() {
+                          _isChecked[index] = value!;
+                        });
+                      },
+                    ),
+                    Expanded(
+                      child: TextField(
+                        controller: _controllers[index],
+                        decoration: const InputDecoration(
+                          enabledBorder: InputBorder.none,
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () {
+                        onChanged: (value) {
                           setState(() {
-                            _controllers.removeAt(index);
-                            _isChecked.removeAt(index);
-                            _values.removeAt(index);
-                            ans.removeAt(index);
+                            ans[index] = value;
                           });
                         },
-                        icon: const Icon(Icons.cancel_outlined),
                       ),
-                    ],
-                  ),
-                );
-              } else if (dropdownValue == "Text") {
-                return Container(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _textController,
-                          decoration: const InputDecoration(
-                            hintText: "Hariult avah heseg",
-                            enabledBorder: InputBorder.none,
-                          ),
-                          onChanged: (value) {
-                            setState(() {});
-                          },
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _controllers.removeAt(index);
+                          _isChecked.removeAt(index);
+                          _values.removeAt(index);
+                          ans.removeAt(index);
+                        });
+                      },
+                      icon: const Icon(Icons.cancel_outlined),
+                    ),
+                  ],
+                ),
+              );
+            } else if (dropdownValue == "Text") {
+              return Container(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _textController,
+                        decoration: const InputDecoration(
+                          hintText: "Hariult avah heseg",
+                          enabledBorder: InputBorder.none,
                         ),
+                        onChanged: (value) {
+                          setState(() {});
+                        },
                       ),
-                      IconButton(
-                        onPressed: () {
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _controllers.removeAt(index);
+                          _values.removeAt(index);
+                          ans.removeAt(index);
+                        });
+                      },
+                      icon: const Icon(Icons.cancel_outlined),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return Container(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Radio(
+                      value: _values[index],
+                      groupValue: _selectedValue,
+                      onChanged: (int? value) {
+                        setState(() {
+                          _selectedValue = value!;
+                        });
+                      },
+                    ),
+                    Expanded(
+                      child: TextField(
+                        controller: _controllers[index],
+                        decoration: const InputDecoration(
+                          enabledBorder: InputBorder.none,
+                        ),
+                        onChanged: (value) {
                           setState(() {
-                            _controllers.removeAt(index);
-                            _values.removeAt(index);
-                            ans.removeAt(index);
+                            ans[index] = value;
                           });
                         },
-                        icon: const Icon(Icons.cancel_outlined),
                       ),
-                    ],
-                  ),
-                );
-              } else {
-                return Container(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _controllers.removeAt(index);
+                          _values.removeAt(index);
+                          ans.removeAt(index);
+                        });
+                      },
+                      icon: const Icon(Icons.cancel_outlined),
+                    ),
+                  ],
+                ),
+              );
+            }
+          }),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            child: InkWell(
+              onTap: addOptions,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children: [
                       Radio(
-                        value: _values[index],
+                        value: 50,
                         groupValue: _selectedValue,
                         onChanged: (int? value) {
                           setState(() {
@@ -249,153 +317,100 @@ class QuestWidgetState extends State<QuestWidget> {
                           });
                         },
                       ),
-                      Expanded(
-                        child: TextField(
-                          controller: _controllers[index],
-                          decoration: const InputDecoration(
-                            enabledBorder: InputBorder.none,
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              ans[index] = value;
-                            });
-                          },
+                      const Text(
+                        "Add option",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _controllers.removeAt(index);
-                            _values.removeAt(index);
-                            ans.removeAt(index);
-                          });
-                        },
-                        icon: const Icon(Icons.cancel_outlined),
                       ),
                     ],
                   ),
-                );
-              }
-            }),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              padding: const EdgeInsets.all(8.0),
-              child: InkWell(
-                onTap: addOptions,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Radio(
-                          value: 50,
-                          groupValue: _selectedValue,
-                          onChanged: (int? value) {
-                            setState(() {
-                              _selectedValue = value!;
-                            });
-                          },
-                        ),
-                        const Text(
-                          "Add option",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                ],
               ),
             ),
           ),
-          const Divider(height: 25),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.copy_rounded),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Provider.of<QuestionProvider>(context, listen: false)
-                          .removeQuestion(widget);
-                    },
-                    icon: const Icon(Icons.delete_outline),
-                  ),
-                ],
-              ),
-              const VerticalDivider(
-                thickness: 5,
-              ),
-              SizedBox(
-                child: Row(
+        ),
+        const Divider(height: 25),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.copy_rounded),
+                ),
+                IconButton(
+                  onPressed: () {
+                    Provider.of<QuestionProvider>(context, listen: false)
+                        .removeQuestion(widget);
+                  },
+                  icon: const Icon(Icons.delete_outline),
+                ),
+              ],
+            ),
+            const VerticalDivider(
+              thickness: 5,
+            ),
+            SizedBox(
+              child: Row(children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        const Text(
-                          "Required",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Checkbox(
-                          value: isMandatory,
-                          activeColor: Colors.black.withOpacity(0.6),
-                          onChanged: (value) {
-                            setState(() {
-                              isMandatory = value!;
-                            });
-                          },
-                        ),
-                      ],
+                    const Text(
+                      "Required",
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(
-                      width: 5,
-                      // ),
-                      // ElevatedButton(
-                      //   onPressed: () {
-                      //     QuestionModel? question;
-                      //     List<AnswerModel> answers =
-                      //         ans.map((e) => AnswerModel(answerText: e)).toList();
-                      //     for (var type in pastTypes!) {
-                      //       if (dropdownValue == type.questionType) {
-                      //         // dataProvider.quests.add();
-
-                      //         question = QuestionModel(
-                      //           surveyID: widget.id,
-                      //           questionsTypeID: type.id ?? "",
-                      //           questionText: ques,
-                      //           isMandatory: isMandatory,
-                      //           answers: answers,
-                      //         );
-                      //         break;
-                      //       }
-                      //     }
-                      //     if (question != null) {
-                      //       postQuestion(question);
-                      //     } else {
-                      //       print('Question type taarsngu.');
-                      //     }
-                      //   },
-                      //   style: ElevatedButton.styleFrom(
-                      //     backgroundColor: Colors.black.withOpacity(0.5),
-                      //     foregroundColor: Colors.white,
-                      //   ),
-                      //   child: const Text("Save"),
-                      // ),
+                    Checkbox(
+                      value: isMandatory,
+                      activeColor: Colors.black.withOpacity(0.6),
+                      onChanged: (value) {
+                        setState(() {
+                          isMandatory = value!;
+                        });
+                      },
                     ),
                   ],
                 ),
-              ),
-            ],
-          )
-        ],
-      ),
+                const SizedBox(
+                  width: 5,
+                ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     QuestionModel? question;
+                //     List<AnswerModel> answers =
+                //         ans.map((e) => AnswerModel(answerText: e)).toList();
+                //     for (var type in pastTypes!) {
+                //       if (dropdownValue == type.questionType) {
+                //         // dataProvider.quests.add();
+
+                //         question = QuestionModel(
+                //           surveyID: widget.id,
+                //           questionsTypeID: type.id ?? "",
+                //           questionText: ques,
+                //           isMandatory: isMandatory,
+                //           answers: answers,
+                //         );
+                //         break;
+                //       }
+                //     }
+                //     if (question != null) {
+                //       postQuestion(question);
+                //     } else {
+                //       print('Question type taarsngu.');
+                //     }
+                //   },
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor: Colors.black.withOpacity(0.5),
+                //     foregroundColor: Colors.white,
+                //   ),
+                //   child: const Text("Save"),
+                // ),
+              ]),
+            )
+          ],
+        ),
+      ]),
     );
   }
 }

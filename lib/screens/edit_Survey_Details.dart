@@ -11,10 +11,10 @@ class EditSurveyDetailWidget extends StatefulWidget {
   });
 
   @override
-  _EditSurveyDetailWidgetState createState() => _EditSurveyDetailWidgetState();
+  EditSurveyDetailWidgetState createState() => EditSurveyDetailWidgetState();
 }
 
-class _EditSurveyDetailWidgetState extends State<EditSurveyDetailWidget> {
+class EditSurveyDetailWidgetState extends State<EditSurveyDetailWidget> {
   List<AllSurvey>? allSurveys;
   bool isLoaded = false;
   final TextEditingController surveyNameController = TextEditingController();

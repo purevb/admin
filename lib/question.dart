@@ -2,12 +2,10 @@ import 'dart:convert';
 import 'package:admin/models/survey_model.dart';
 import 'package:admin/provider/question_provider.dart';
 import 'package:admin/screens/all_surveys.dart';
-import 'package:admin/services/question_type_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'models/question_model.dart';
-import 'models/question_type_model.dart';
 import 'screens/create_question_cell.dart';
 
 class QuestionWidget extends StatefulWidget {
@@ -21,72 +19,49 @@ class QuestionWidget extends StatefulWidget {
 }
 
 class QuestionWidgetState extends State<QuestionWidget> {
-  final _questionFormKey = GlobalKey<FormState>();
-  bool isMandatory = false;
-  int number = 1;
-  final List<String> ans = [];
-  String ques = '';
-  List<QuestionType>? pastTypes;
-  List<String> list = [];
-  String? dropdownValue;
+  void collectSaveQuestions() {
+    List<QuestionModel?> allQuestions = [];
+    var questionProvider =
+        Provider.of<QuestionProvider>(context, listen: false);
 
-  var dataProvider = QuestionProvider();
+    for (var questWidget in questionProvider.quests) {
+      final questWidgetState = (questWidget as QuestWidget).createState();
+      final questionModel = questWidgetState.getQuestionModel();
+      if (questionModel == null) {
+        print("Validation failed: Missing required fields");
+        return;
+      }
+      allQuestions.add(questionModel);
+    }
 
-  Future<void> postQuestion(List<QuestionModel?> question) async {
+    saveQuestionsToBackend(allQuestions.whereType<QuestionModel>().toList());
+  }
+
+  void saveQuestionsToBackend(List<QuestionModel> questions) async {
     final url = Uri.parse('http://localhost:3106/api/questions');
     try {
+      final questionJson = questions.map((q) => q.toJson()).toList();
+      print('Question JSON: $questionJson');
+
       final response = await http.post(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode(question.map((q) => q?.toJson()).toList()),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(questionJson),
       );
 
       if (response.statusCode == 200) {
-        print('Question saved successfully');
+        print('Questions saved successfully');
       } else {
-        print('Failed to save question. Status code: ${response.statusCode}');
+        print('Failed to save questions. Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
       }
     } catch (e) {
-      print('Error occurred while posting question: $e');
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getQuestionTypeData();
-  }
-
-  Future<void> getQuestionTypeData() async {
-    try {
-      pastTypes = await TypesRemoteService().getType();
-      setState(() {
-        if (pastTypes != null && pastTypes!.isNotEmpty) {
-          list = pastTypes!.map((type) => type.questionType).toList();
-          dropdownValue = list.isNotEmpty ? list.first : null;
-        } else {
-          dropdownValue = null;
-        }
-      });
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
-
-  void debugPrintQuestions() {
-    for (var question in dataProvider.questions) {
-      print('Question to send: ${question?.toJson()}');
+      print('Error occurred while posting questions: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -107,23 +82,6 @@ class QuestionWidgetState extends State<QuestionWidget> {
             ),
             child: const Text("Surveys"),
           ),
-          SizedBox(
-            width: width * 0.2,
-          ),
-          const Placeholder(
-            fallbackHeight: 30,
-            fallbackWidth: 100,
-          ),
-          const SizedBox(
-            width: 20,
-          ),
-          const Placeholder(
-            fallbackHeight: 30,
-            fallbackWidth: 100,
-          ),
-          const SizedBox(
-            width: 20,
-          ),
           Padding(
             padding: const EdgeInsets.only(right: 20),
             child: Container(
@@ -141,43 +99,33 @@ class QuestionWidgetState extends State<QuestionWidget> {
           )
         ],
       ),
-      body: Form(
-        key: _questionFormKey,
-        child: Row(
-          children: [
-            Container(
-              width: width * 0.3,
-              height: height + 20,
-              color: const Color.fromARGB(255, 59, 59, 57),
-              child: SurveyDetails(survey: widget.survey),
+      body: Row(
+        children: [
+          Container(
+            width: MediaQuery.of(context).size.width * 0.3,
+            color: const Color.fromARGB(255, 59, 59, 57),
+            child: SurveyDetails(survey: widget.survey),
+          ),
+          Container(
+            padding: const EdgeInsets.only(top: 20, left: 20, bottom: 60),
+            width: MediaQuery.of(context).size.width * 0.7 - 30,
+            child: Consumer<QuestionProvider>(
+              builder: (context, questionProvider, child) {
+                return ListView.separated(
+                  itemBuilder: (BuildContext context, int index) {
+                    return questionProvider.quests[index];
+                  },
+                  separatorBuilder: (BuildContext context, int index) =>
+                      const SizedBox(height: 10),
+                  itemCount: questionProvider.quests.length,
+                );
+              },
             ),
-            Container(
-              padding: const EdgeInsets.only(top: 20, left: 20),
-              width: width * 0.7 - 30,
-              height: height,
-              child: Consumer<QuestionProvider>(
-                builder: (context, questionProvider, child) {
-                  return ListView.separated(
-                    shrinkWrap: true,
-                    itemBuilder: (BuildContext context, int index) {
-                      return questionProvider.quests[index];
-                    },
-                    separatorBuilder: (BuildContext context, int index) =>
-                        const SizedBox(
-                      height: 10,
-                    ),
-                    itemCount: questionProvider.quests.length,
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // postQuestion()
-        },
+        onPressed: collectSaveQuestions,
         backgroundColor: const Color(0xff15ae5c),
         tooltip: "Save all questions",
         child: const Icon(Icons.save),
