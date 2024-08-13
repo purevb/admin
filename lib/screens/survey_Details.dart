@@ -1,11 +1,8 @@
-import 'package:admin/provider/question_provider.dart';
-import 'package:admin/screens/create_question_cell.dart';
 import 'package:admin/screens/edit_survey_details.dart';
 import 'package:admin/services/question_service.dart';
 import 'package:flutter/material.dart';
 import 'package:admin/models/all_survey_model.dart';
 import 'package:admin/services/all_survey.dart';
-import 'package:provider/provider.dart';
 
 class SurveyDetailWidget extends StatefulWidget {
   final String id;

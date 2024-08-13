@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class AnswerModel {
-  final String answerText;
+  late final String answerText;
 
   AnswerModel({
     required this.answerText,
@@ -20,10 +20,10 @@ class AnswerModel {
 
 class QuestionModel {
   final String surveyID;
-  final String? questionsTypeID;
-  final String? questionText;
-  final List<AnswerModel>? answers;
-  final bool? isMandatory;
+  late final String? questionsTypeID;
+  late final String? questionText;
+  late final List<AnswerModel>? answers;
+  late final bool? isMandatory;
 
   QuestionModel({
     required this.surveyID,

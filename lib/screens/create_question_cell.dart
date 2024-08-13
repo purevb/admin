@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:admin/models/question_model.dart';
 import 'package:admin/models/question_type_model.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class QuestWidget extends StatefulWidget {
   final String id;
