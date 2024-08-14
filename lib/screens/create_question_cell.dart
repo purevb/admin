@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:admin/models/question_model.dart';
 import 'package:admin/models/question_type_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class QuestWidget extends StatefulWidget {
   final String id;
@@ -96,27 +97,6 @@ class QuestWidgetState extends State<QuestWidget> {
       print('Failed to save question');
       print(response.body);
     }
-  }
-
-  QuestionModel? getQuestionModel() {
-    if (ques.isEmpty || dropdownValue == null) {
-      return null;
-    }
-    List<AnswerModel> answers =
-        ans.map((e) => AnswerModel(answerText: e)).toList();
-    for (var type in pastTypes!) {
-      if (dropdownValue == type.questionType) {
-        return QuestionModel(
-          surveyID: widget.id,
-          questionsTypeID: dropdownValue!,
-          questionText: ques,
-          isMandatory: isMandatory,
-          answers: answers,
-        );
-      }
-    }
-    print(dropdownValue);
-    return null;
   }
 
   @override
@@ -378,37 +358,37 @@ class QuestWidgetState extends State<QuestWidget> {
                 const SizedBox(
                   width: 5,
                 ),
-                // ElevatedButton(
-                //   onPressed: () {
-                //     QuestionModel? question;
-                //     List<AnswerModel> answers =
-                //         ans.map((e) => AnswerModel(answerText: e)).toList();
-                //     for (var type in pastTypes!) {
-                //       if (dropdownValue == type.questionType) {
-                //         // dataProvider.quests.add();
+                ElevatedButton(
+                  onPressed: () {
+                    QuestionModel? question;
+                    List<AnswerModel> answers =
+                        ans.map((e) => AnswerModel(answerText: e)).toList();
+                    for (var type in pastTypes!) {
+                      if (dropdownValue == type.questionType) {
+                        // dataProvider.quests.add();
 
-                //         question = QuestionModel(
-                //           surveyID: widget.id,
-                //           questionsTypeID: type.id ?? "",
-                //           questionText: ques,
-                //           isMandatory: isMandatory,
-                //           answers: answers,
-                //         );
-                //         break;
-                //       }
-                //     }
-                //     if (question != null) {
-                //       postQuestion(question);
-                //     } else {
-                //       print('Question type taarsngu.');
-                //     }
-                //   },
-                //   style: ElevatedButton.styleFrom(
-                //     backgroundColor: Colors.black.withOpacity(0.5),
-                //     foregroundColor: Colors.white,
-                //   ),
-                //   child: const Text("Save"),
-                // ),
+                        question = QuestionModel(
+                          surveyID: widget.id,
+                          questionsTypeID: type.id ?? "",
+                          questionText: ques,
+                          isMandatory: isMandatory,
+                          answers: answers,
+                        );
+                        break;
+                      }
+                    }
+                    if (question != null) {
+                      postQuestion(question);
+                    } else {
+                      print('Question type taarsngu.');
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black.withOpacity(0.5),
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text("Save"),
+                ),
               ]),
             )
           ],

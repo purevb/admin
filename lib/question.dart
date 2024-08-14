@@ -68,7 +68,31 @@ class QuestionWidgetState extends State<QuestionWidget> {
   }
 
   void collectSaveQuestions() {
-    List<QuestionModel> allQuestions = List.from(quests);
+    List<QuestionModel> allQuestions = [];
+    for (var i = 0; i < quests.length; i++) {
+      String questionText = takeQuestion![i];
+      // print(questionText);
+      bool mandatory = takeMandatory![i];
+      // print(mandatory);
+      String questionType = dropdownValue[i];
+      // print(questionType);
+      // print(widget.id);
+      List<AnswerModel> answers = [];
+      for (var controller in _controllers[i]) {
+        answers.add(AnswerModel(answerText: controller.text));
+        // print(controller.text);
+      }
+      QuestionModel question = QuestionModel(
+        surveyID: widget.id,
+        questionsTypeID: pastTypes
+            ?.firstWhere((type) => type.questionType == questionType)
+            .id,
+        questionText: questionText,
+        answers: answers.isNotEmpty ? answers : null,
+        isMandatory: mandatory,
+      );
+      allQuestions.add(question);
+    }
     saveQuestionsToBackend(allQuestions);
   }
 
@@ -76,13 +100,16 @@ class QuestionWidgetState extends State<QuestionWidget> {
     final url = Uri.parse('http://localhost:3106/api/questions');
     try {
       final questionJson = questions.map((q) => q.toJson()).toList();
+      // print(questionJson);
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: json.encode(questionJson),
+        body: json.encode({'questions': questionJson}),
       );
-
+      print(response.body);
       if (response.statusCode == 200) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => AllSurveys()));
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Questions saved successfully')),
         );
