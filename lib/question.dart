@@ -20,32 +20,26 @@ class QuestionWidget extends StatefulWidget {
 
 class QuestionWidgetState extends State<QuestionWidget> {
   final List<QuestionModel> quests = [];
-  bool isMandatory = false;
-  int _selectedValue = 1;
-  List<int> number = [];
+  List<bool> isMandatory = [];
+  List<String> dropdownValue = [];
+  final _textController = TextEditingController();
   final List<List<TextEditingController>> _controllers = [];
-  // final List<TextEditingController> _controllers = [];
-
   final List<List<int>> _values = [];
   final List<List<bool>> _isChecked = [];
   final List<TextEditingController> _questionController = [];
-  final _textController = TextEditingController();
-  int? questionIndex = 0;
-  String ques = '';
-  List<String> ans = [];
-  bool isLoaded = false;
+  int _selectedValue = 1;
   List<QuestionType>? pastTypes;
   List<QuestionModel>? pastQuestions;
   List<String> list = [];
-  String? dropdownValue;
+  bool isLoaded = false;
 
+  final List<String>? takeQuestion = [];
+  List<bool>? takeMandatory = [];
+  List<String>? takeAnswers = [];
   @override
   void initState() {
     super.initState();
     getData();
-    _controllers.add([]);
-    _values.add([]);
-    _isChecked.add([]);
   }
 
   Future<void> getData() async {
@@ -56,9 +50,13 @@ class QuestionWidgetState extends State<QuestionWidget> {
         isLoaded = true;
         if (pastTypes != null && pastTypes!.isNotEmpty) {
           list = pastTypes!.map((type) => type.questionType).toList();
-          dropdownValue = list.isNotEmpty ? list.first : null;
+
+          dropdownValue = List.generate(
+            quests.length,
+            (index) => list.isNotEmpty ? list.first : '',
+          );
         } else {
-          dropdownValue = null;
+          dropdownValue = List.filled(quests.length, '');
         }
       });
     } catch (e) {
@@ -100,12 +98,28 @@ class QuestionWidgetState extends State<QuestionWidget> {
     }
   }
 
+  void addQuestion() {
+    setState(() {
+      var question = QuestionModel(surveyID: widget.id);
+      quests.add(question);
+      _questionController.add(TextEditingController());
+      _controllers.add([]);
+      _isChecked.add([]);
+      _values.add([]);
+      takeQuestion!.add("");
+      takeMandatory!.add(false);
+      takeAnswers!.add("");
+      isMandatory.add(false);
+      dropdownValue.add(list.isNotEmpty ? list.first : "");
+    });
+  }
+
   void addOptions(int index) {
     setState(() {
-      _controllers[index].add(TextEditingController(text: "Option $number"));
+      _controllers[index].add(TextEditingController(
+          text: "Option ${_controllers[index].length + 1}"));
       _isChecked[index].add(false);
-      _values[index].add(1);
-      ans.add("");
+      _values[index].add(0);
     });
   }
 
@@ -139,35 +153,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
               color: const Color(0xff8146f6),
               child: IconButton(
                 icon: const Icon(Icons.add),
-                onPressed: () {
-                  if (dropdownValue != null) {
-                    var question = QuestionModel(surveyID: widget.id);
-                    // List<AnswerModel> answers =
-                    // ans.map((e) => AnswerModel(answerText: e)).toList();
-
-                    for (var type in pastTypes!) {
-                      if (dropdownValue == type.questionType) {
-                        question = QuestionModel(
-                          surveyID: widget.id,
-                          // questionsTypeID: type.id!,
-                          // questionText: ques,
-                          // answers: answers,
-                          // isMandatory: isMandatory,
-                        );
-                        quests.add(question);
-                        _questionController.add(TextEditingController());
-                        _controllers.add([]);
-                        _isChecked.add([]);
-                        _values.add([]);
-                        print("${quests[0].surveyID} + sda");
-                      }
-                    }
-
-                    setState(() {
-                      questionIndex = questionIndex! + 1;
-                    });
-                  }
-                },
+                onPressed: addQuestion,
                 tooltip: "Add Question",
                 color: Colors.white,
               ),
@@ -215,7 +201,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
                                     ),
                                     onChanged: (value) {
                                       setState(() {
-                                        quests[index].questionText = value;
+                                        takeQuestion![index] = value;
                                       });
                                     },
                                   ),
@@ -236,7 +222,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: DropdownButton<String>(
-                                  value: dropdownValue,
+                                  value: dropdownValue[index],
                                   icon: const Icon(Icons.arrow_drop_down),
                                   elevation: 16,
                                   items: list.map((value) {
@@ -245,16 +231,15 @@ class QuestionWidgetState extends State<QuestionWidget> {
                                       child: Text(value),
                                     );
                                   }).toList(),
-                                  onChanged: (value) {
+                                  onChanged: (String? value) {
                                     setState(() {
-                                      dropdownValue = value;
-                                      for (var type in pastTypes!) {
-                                        if (dropdownValue ==
-                                            type.questionType) {
-                                          quests[index].questionsTypeID =
-                                              type.id;
-                                        }
-                                      }
+                                      dropdownValue[index] = value!;
+                                      // for (var type in pastTypes!) {
+                                      //   if (value == type.questionType) {
+                                      //     quests[index].questionsTypeID =
+                                      //         type.id!;
+                                      //   }
+                                      // }
                                     });
                                   },
                                 ),
@@ -264,7 +249,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
                           Column(
                             children: List.generate(_controllers[index].length,
                                 (optIndex) {
-                              if (dropdownValue == "Multiple Choice") {
+                              if (dropdownValue[index] == "Multiple Choice") {
                                 return Container(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
@@ -289,7 +274,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
                                           ),
                                           onChanged: (value) {
                                             setState(() {
-                                              ans[index] = value;
+                                              takeAnswers![index] = value;
                                             });
                                           },
                                         ),
@@ -302,7 +287,6 @@ class QuestionWidgetState extends State<QuestionWidget> {
                                             _isChecked[index]
                                                 .removeAt(optIndex);
                                             _values[index].removeAt(optIndex);
-                                            ans.removeAt(optIndex);
                                           });
                                         },
                                         icon: const Icon(Icons.cancel_outlined),
@@ -310,7 +294,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
                                     ],
                                   ),
                                 );
-                              } else if (dropdownValue == "Text") {
+                              } else if (dropdownValue[index] == "Text") {
                                 return Container(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
@@ -361,7 +345,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
                                           ),
                                           onChanged: (value) {
                                             setState(() {
-                                              ans[index] = value;
+                                              takeAnswers![index] = value;
                                             });
                                           },
                                         ),
@@ -372,7 +356,6 @@ class QuestionWidgetState extends State<QuestionWidget> {
                                             _controllers[index]
                                                 .removeAt(optIndex);
                                             _values[index].removeAt(optIndex);
-                                            ans.removeAt(optIndex);
                                           });
                                         },
                                         icon: const Icon(Icons.cancel_outlined),
@@ -425,47 +408,34 @@ class QuestionWidgetState extends State<QuestionWidget> {
                               Row(
                                 children: [
                                   IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.copy_rounded),
-                                  ),
-                                  IconButton(
                                     onPressed: () {
-                                      quests.remove(quests[index]);
+                                      setState(() {
+                                        quests.removeAt(index);
+                                        _questionController.removeAt(index);
+                                        _controllers.removeAt(index);
+                                        _isChecked.removeAt(index);
+                                        _values.removeAt(index);
+                                        takeMandatory!.removeAt(index);
+                                        dropdownValue.removeAt(index);
+                                      });
                                     },
                                     icon: const Icon(Icons.delete_outline),
                                   ),
                                 ],
                               ),
-                              const VerticalDivider(
-                                thickness: 5,
-                              ),
-                              SizedBox(
-                                child: Row(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Text(
-                                          "Required",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Checkbox(
-                                          value: isMandatory,
-                                          activeColor:
-                                              Colors.black.withOpacity(0.6),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              isMandatory = value!;
-                                              quests[index].isMandatory =
-                                                  isMandatory;
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(width: 5),
-                                  ],
-                                ),
+                              const VerticalDivider(thickness: 5),
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: isMandatory[index],
+                                    onChanged: (value) {
+                                      setState(() {
+                                        isMandatory[index] = value!;
+                                      });
+                                    },
+                                  ),
+                                  const Text("Required"),
+                                ],
                               )
                             ],
                           ),

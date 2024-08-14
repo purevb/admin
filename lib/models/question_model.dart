@@ -56,6 +56,8 @@ class QuestionModel {
             : null,
         "is_Mandatory": isMandatory,
       };
+
+  void removeAt(int optIndex) {}
 }
 
 List<QuestionModel> questionFromJson(String str) {
