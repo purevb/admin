@@ -39,6 +39,31 @@ class SurveyDetailWidgetState extends State<SurveyDetailWidget> {
     }
   }
 
+  Future<void> _dialogBuilder(BuildContext context, String id) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Асуулт устгах"),
+            content: const Text("Асуулт устгах зөвшөөрөл!"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("Үгүй"),
+              ),
+              TextButton(
+                onPressed: () {
+                  removeQuestions(id);
+                },
+                child: const Text("Тийм"),
+              )
+            ],
+          );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -215,8 +240,10 @@ class SurveyDetailWidgetState extends State<SurveyDetailWidget> {
                                               IconButton(
                                                   tooltip: "Delete question",
                                                   onPressed: () {
-                                                    removeQuestions(
-                                                        question.id);
+                                                    // removeQuestions(
+                                                    //     question.id);
+                                                    _dialogBuilder(
+                                                        context, question.id);
                                                   },
                                                   icon:
                                                       const Icon(Icons.delete))

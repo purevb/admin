@@ -46,6 +46,31 @@ class AllSurveyWidgetState extends State<AllSurveys> {
     }
   }
 
+  Future<void> _dialogBuilder(BuildContext context, String id) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Асуулт устгах"),
+            content: const Text("Асуулт устгах зөвшөөрөл!"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("Үгүй"),
+              ),
+              TextButton(
+                onPressed: () {
+                  deleteSurvey(id);
+                },
+                child: const Text("Тийм"),
+              )
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,7 +160,9 @@ class AllSurveyWidgetState extends State<AllSurveys> {
                                 bottom: 0,
                                 child: IconButton(
                                     onPressed: () {
-                                      deleteSurvey(allSurveys![index].id);
+                                      _dialogBuilder(
+                                          context, allSurveys![index].id);
+                                      // deleteSurvey(allSurveys![index].id);
                                     },
                                     icon: const Icon(Icons.delete_forever)))
                           ],
