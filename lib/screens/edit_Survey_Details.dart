@@ -117,6 +117,7 @@ class EditSurveyDetailWidgetState extends State<EditSurveyDetailWidget> {
             content: Text('Survey and questions updated successfully!'),
           ),
         );
+        getData();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

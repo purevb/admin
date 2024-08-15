@@ -1,8 +1,11 @@
+import 'package:admin/provider/question_provider.dart';
+import 'package:admin/screens/create_question_cell.dart';
 import 'package:admin/screens/edit_survey_details.dart';
 import 'package:admin/services/question_service.dart';
 import 'package:flutter/material.dart';
 import 'package:admin/models/all_survey_model.dart';
 import 'package:admin/services/all_survey.dart';
+import 'package:provider/provider.dart';
 
 class SurveyDetailWidget extends StatefulWidget {
   final String id;
@@ -85,7 +88,19 @@ class SurveyDetailWidgetState extends State<SurveyDetailWidget> {
               color: const Color(0xff8146f6),
               child: IconButton(
                 icon: const Icon(Icons.add),
-                onPressed: () {},
+                onPressed: () {
+                  Provider.of<QuestionProvider>(context, listen: false)
+                      .addQuestions(
+                    QuestWidget(
+                      id: widget.id,
+                      onQuestionSaved: () {
+                        getData();
+                        Provider.of<QuestionProvider>(context, listen: false)
+                            .removeQuestions(widget);
+                      },
+                    ),
+                  );
+                },
                 tooltip: "Create question",
                 color: Colors.white,
               ),
@@ -234,6 +249,26 @@ class SurveyDetailWidgetState extends State<SurveyDetailWidget> {
                                     ));
                               }).toList(),
                             ),
+                            SizedBox(
+                              width: double.infinity,
+                              child: Consumer<QuestionProvider>(
+                                builder: (context, questionProvider, child) {
+                                  return ListView.separated(
+                                    shrinkWrap: true,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return questionProvider
+                                          .questionWidget[index];
+                                    },
+                                    separatorBuilder:
+                                        (BuildContext context, int index) =>
+                                            const SizedBox(height: 10),
+                                    itemCount:
+                                        questionProvider.questionWidget.length,
+                                  );
+                                },
+                              ),
+                            )
                           ],
                         ),
                       );

@@ -3,9 +3,18 @@ import 'package:flutter/material.dart';
 
 class QuestionProvider extends ChangeNotifier {
   final List<QuestionModel> quests = [];
-
+  final List<Widget> questionWidget = [];
   final List<QuestionModel?> questions = [];
   final List<String> answerID = [];
+  void addQuestions(Widget widget) {
+    questionWidget.add(widget);
+    notifyListeners();
+  }
+
+  void removeQuestions(Widget widget) {
+    questionWidget.remove(widget);
+    notifyListeners();
+  }
 
   void addAnswerIdData(String id) {
     answerID.add(id);

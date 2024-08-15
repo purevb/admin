@@ -10,10 +10,11 @@ import 'package:provider/provider.dart';
 
 class QuestWidget extends StatefulWidget {
   final String id;
-
+  final VoidCallback onQuestionSaved;
   const QuestWidget({
     super.key,
     required this.id,
+    required this.onQuestionSaved,
   });
 
   @override
@@ -92,7 +93,11 @@ class QuestWidgetState extends State<QuestWidget> {
       body: json.encode(question.toJson()),
     );
     if (response.statusCode == 200) {
-      print('Question saved successfully');
+      // print('Question saved successfully');
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Question saved succesfully'),
+      ));
+      widget.onQuestionSaved();
     } else {
       print('Failed to save question');
       print(response.body);
@@ -326,8 +331,8 @@ class QuestWidgetState extends State<QuestWidget> {
                 ),
                 IconButton(
                   onPressed: () {
-                    // Provider.of<QuestionProvider>(context, listen: false)
-                    //     .removeQuestion(widget);
+                    Provider.of<QuestionProvider>(context, listen: false)
+                        .removeQuestions(widget);
                   },
                   icon: const Icon(Icons.delete_outline),
                 ),
