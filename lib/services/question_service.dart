@@ -7,6 +7,7 @@ class QuestionRemoteService {
     var urils = Uri.parse('http://localhost:3106/api/question');
     try {
       var response = await clientls.get(urils);
+      // print("zzzzz");
       if (response.statusCode == 200) {
         var json = response.body;
         return questionFromJson(json);

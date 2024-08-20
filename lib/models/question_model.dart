@@ -19,6 +19,7 @@ class AnswerModel {
 }
 
 class QuestionModel {
+  late String? id;
   final String surveyID;
   late final String? questionsTypeID;
   late final String? questionText;
@@ -27,6 +28,7 @@ class QuestionModel {
 
   QuestionModel({
     required this.surveyID,
+    this.id,
     this.questionsTypeID,
     this.questionText,
     this.answers,
@@ -34,16 +36,18 @@ class QuestionModel {
   });
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) {
-    var answersFromJson = json['answers'] as List;
-    List<AnswerModel> answersList =
-        answersFromJson.map((answer) => AnswerModel.fromJson(answer)).toList();
+    var answersFromJson = json['answers'] as List?;
+    List<AnswerModel> answersList = answersFromJson != null
+        ? answersFromJson.map((answer) => AnswerModel.fromJson(answer)).toList()
+        : [];
 
     return QuestionModel(
-      surveyID: json['surveyID'],
-      questionsTypeID: json['questions_type_id'],
-      questionText: json['question_text'],
+      surveyID: json['surveyID'] as String,
+      id: json['id'] as String?,
+      questionsTypeID: json['questionsTypeID'] as String?,
+      questionText: json['questionText'] as String?,
       answers: answersList,
-      isMandatory: json['is_Mandatory'],
+      isMandatory: json['isMandatory'] as bool?,
     );
   }
 

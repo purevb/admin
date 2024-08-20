@@ -1,5 +1,6 @@
 import 'package:admin/admin.dart';
 import 'package:admin/models/all_survey_model.dart';
+import 'package:admin/screens/costumer_answers.dart';
 import 'package:admin/screens/survey_details.dart';
 import 'package:admin/services/all_survey.dart';
 import 'package:flutter/material.dart';
@@ -82,6 +83,26 @@ class AllSurveyWidgetState extends State<AllSurveys> {
           "All surveys",
           style: TextStyle(color: Colors.white),
         ),
+        leading: Builder(
+          builder: (BuildContext context) {
+            return Padding(
+              padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
+              child: Container(
+                color: const Color(0xff8146f6),
+                child: IconButton(
+                  iconSize: 23,
+                  icon: const Icon(Icons.question_answer_sharp),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ConsumerAnswer()));
+                  },
+                ),
+              ),
+            );
+          },
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 20),
@@ -98,7 +119,7 @@ class AllSurveyWidgetState extends State<AllSurveys> {
                   );
                 },
                 tooltip: "Create Survey",
-                color: Colors.white,
+                color: Colors.black,
               ),
             ),
           )
@@ -142,6 +163,11 @@ class AllSurveyWidgetState extends State<AllSurveys> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
+                                      // Image.network(
+                                      //   allSurveys![index].imgUrl,
+                                      //   width: 150,
+                                      //   height: 150,
+                                      // ),
                                       Text(
                                         "Survey Name: ${allSurveys![index].surveyName}",
                                         style: const TextStyle(
