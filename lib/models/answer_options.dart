@@ -1,11 +1,9 @@
 import 'dart:convert';
 
-import 'package:admin/models/question_model.dart';
-
 class AnswerOptions {
   final String surveyId;
   final String id;
-  final QuestionModel question;
+  final String questionId;
   final String responseId;
   final List<String>? userChoice;
   final String userId;
@@ -13,39 +11,35 @@ class AnswerOptions {
   AnswerOptions({
     required this.surveyId,
     required this.id,
-    required this.question,
+    required this.questionId,
     required this.responseId,
     required this.userChoice,
     required this.userId,
   });
 
   factory AnswerOptions.fromJson(Map<String, dynamic> json) {
-  return AnswerOptions(
-    surveyId: json['survey_id'] ?? '',
-    id: json['_id'] ?? '',
-    question: json['question_id'] != null
-        ? QuestionModel.fromJson(json['question_id'])
-        : throw ArgumentError('Invalid or missing question_id'),
-    responseId: json['response_id'] ?? '',
-    userChoice: json['user_choice'] != null
-        ? List<String>.from(json['user_choice'])
-        : null,
-    userId: json['user_id'] ?? '',
-  );
-}
-
+    return AnswerOptions(
+      surveyId: json['survey_id'] ?? '',
+      id: json['_id'] ?? '',
+      questionId: json['question_id'] ?? '',
+      responseId: json['response_id'] ?? '',
+      userChoice: json['user_choice'] != null
+          ? List<String>.from(json['user_choice'])
+          : null,
+      userId: json['user_id'] ?? '',
+    );
+  }
 
   Map<String, dynamic> toJson() {
-  return {
-    'survey_id': surveyId,
-    '_id': id,
-    'question_id': question.toJson(), 
-    'response_id': responseId,
-    'user_choice': userChoice,
-    'user_id': userId,
-  };
-}
-
+    return {
+      'survey_id': surveyId,
+      '_id': id,
+      'question_id': questionId,
+      'response_id': responseId,
+      'user_choice': userChoice,
+      'user_id': userId,
+    };
+  }
 }
 
 List<AnswerOptions> typeFromJson(String str) {

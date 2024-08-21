@@ -4,12 +4,13 @@ import 'package:http/http.dart' as http;
 class QuestionRemoteService {
   Future<List<QuestionModel>?> getQuestion() async {
     var clientls = http.Client();
-    var urils = Uri.parse('http://localhost:3106/api/question');
+    var urils = Uri.parse('http://localhost:3106/api/get');
     try {
       var response = await clientls.get(urils);
       // print("zzzzz");
       if (response.statusCode == 200) {
         var json = response.body;
+        // print(json);
         return questionFromJson(json);
       } else {
         print('Server error: ${response.statusCode}');

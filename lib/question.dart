@@ -88,7 +88,7 @@ class QuestionWidgetState extends State<QuestionWidget> {
             ?.firstWhere((type) => type.questionType == questionType)
             .id,
         questionText: questionText,
-        answers: answers,
+        answers: answers.isNotEmpty ? answers : null,
         isMandatory: mandatory,
       );
       allQuestions.add(question);

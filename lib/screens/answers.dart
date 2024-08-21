@@ -36,8 +36,6 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
           allAnswers != null &&
           allAnswers!.isNotEmpty) {
         getSurveyAnswers();
-        print(question!.length);
-        print(allAnswers!.length);
         setState(() {
           isLoaded = true;
         });
@@ -48,20 +46,36 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
   }
 
   void getSurveyAnswers() {
+    myQuestions.clear();
     if (question != null && allAnswers != null) {
       for (var a in allAnswers!) {
         if (widget.id == a.surveyId) {
           myQuestions.add(a);
         }
       }
+      takedata();
       print('Total questions: ${question!.length}');
       print('Total answers: ${allAnswers!.length}');
       print('Filtered answers: ${myQuestions.length}');
       for (var answer in myQuestions) {
-        print('Question ID: ${answer.question.questionText}');
+        // bool questionExists = question!.any((q) => q.id == answer.questionId);
+        // if (questionExists) {
+        print('Question ID: ${answer.questionId}');
         print('Survey ID: ${answer.surveyId}');
+        // }
       }
     }
+  }
+
+  List<QuestionModel> filteredQuestions = [];
+
+  void takedata() {
+    filteredQuestions.clear();
+
+    filteredQuestions = question
+            ?.where((q) => myQuestions.any((m) => q.id == m.questionId))
+            .toList() ??
+        [];
   }
 
   @override
@@ -108,22 +122,53 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
       body: Container(
         color: Colors.white,
         child: isLoaded
-            ? myQuestions.isNotEmpty
-                ? SizedBox(
-                    height: 500,
-                    width: double.infinity,
-                    child: ListView.builder(
-                      itemCount: myQuestions.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return ListTile(
-                          title: Text(
-                            myQuestions[index].question.id?? "s",
+            ? filteredQuestions.isNotEmpty
+                ? ListView.builder(
+                    itemCount: filteredQuestions.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      if (myQuestions[index].questionId ==
+                          filteredQuestions[index].id) {
+                        return Container(
+                          margin: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ListTile(
+                                title: const Text("Question"),
+                                subtitle: Text(
+                                  filteredQuestions[index].questionText ??
+                                      "No Text",
+                                ),
+                              ),
+                              SizedBox(
+                                height: 100,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: filteredQuestions[index]
+                                          .answers
+                                          ?.length ??
+                                      0,
+                                  itemBuilder: (BuildContext context, int a) {
+                                    return ListTile(
+                                      title: Text(filteredQuestions[index]
+                                              .answers![a]
+                                              .answerText ??
+                                          "No Answer Text"),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         );
-                      },
-                    ),
+                      }
+                    },
                   )
-                : const Center(child: Text('No data available'))
+                : const Center(child: Text('No questions found'))
             : const Center(child: CircularProgressIndicator()),
       ),
     );

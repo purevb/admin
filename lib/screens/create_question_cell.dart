@@ -374,7 +374,7 @@ class QuestWidgetState extends State<QuestWidget> {
 
                         question = QuestionModel(
                           surveyID: widget.id,
-                          questionsTypeID: type.id ?? "",
+                          questionsTypeID: type.id,
                           questionText: ques,
                           isMandatory: isMandatory,
                           answers: answers,

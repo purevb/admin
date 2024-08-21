@@ -1,6 +1,9 @@
 import 'dart:convert';
+
+import 'package:admin/models/question_type_model.dart';
+
 class AnswerModel {
-  final String answerText;
+  late final String answerText;
 
   AnswerModel({
     required this.answerText,
@@ -8,7 +11,7 @@ class AnswerModel {
 
   factory AnswerModel.fromJson(Map<String, dynamic> json) {
     return AnswerModel(
-      answerText: json['answer_text'] ?? '',  // Providing a default empty string if null
+      answerText: json['answer_text'],
     );
   }
 
@@ -22,30 +25,31 @@ class QuestionModel {
   final String surveyID;
   final String? questionsTypeID;
   final String? questionText;
-  final List<AnswerModel> answers;  // No need to be nullable if handled properly
+  final List<AnswerModel>? answers;
   final bool? isMandatory;
 
   QuestionModel({
-    required this.surveyID,
     this.id,
+    required this.surveyID,
     this.questionsTypeID,
     this.questionText,
-    this.answers = const [],  // Initialize with an empty list if null
+    this.answers,
     this.isMandatory,
   });
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) {
-    var answersFromJson = json['answers'] as List<dynamic>?;
+    var answersFromJson = json['answers'] as List?;
+    List<AnswerModel> answersList = answersFromJson != null
+        ? answersFromJson.map((answer) => AnswerModel.fromJson(answer)).toList()
+        : [];
 
     return QuestionModel(
-      surveyID: json['surveyID'] as String,
-      id: json['_id'] as String?,  // Make sure this matches your JSON key
-      questionsTypeID: json['questions_type_id'] as String?,
-      questionText: json['question_text'] as String?,
-      answers: answersFromJson != null
-          ? answersFromJson.map((answer) => AnswerModel.fromJson(answer)).toList()
-          : [],
-      isMandatory: json['is_Mandatory'] as bool?,
+      id: json['_id'],
+      surveyID: json['surveyID'] ?? "",
+      questionsTypeID: json['questions_type_id'] ?? "",
+      questionText: json['question_text'] ?? "",
+      answers: answersList,
+      isMandatory: json['is_Mandatory'] ?? false,
     );
   }
 
@@ -54,7 +58,9 @@ class QuestionModel {
         "surveyID": surveyID,
         "questions_type_id": questionsTypeID,
         "question_text": questionText,
-        "answers": List<dynamic>.from(answers.map((x) => x.toJson())),
+        "answers": answers != null
+            ? List<dynamic>.from(answers!.map((x) => x.toJson()))
+            : null,
         "is_Mandatory": isMandatory,
       };
 }
