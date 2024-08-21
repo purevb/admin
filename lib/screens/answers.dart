@@ -58,7 +58,7 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
       print('Total answers: ${allAnswers!.length}');
       print('Filtered answers: ${myQuestions.length}');
       for (var answer in myQuestions) {
-        print('Question ID: ${answer.questionId}');
+        print('Question ID: ${answer.question.questionText}');
         print('Survey ID: ${answer.surveyId}');
       }
     }
@@ -117,7 +117,7 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
                       itemBuilder: (BuildContext context, int index) {
                         return ListTile(
                           title: Text(
-                            myQuestions[index].questionId.questionText ?? "s",
+                            myQuestions[index].question.id?? "s",
                           ),
                         );
                       },
