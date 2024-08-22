@@ -75,6 +75,7 @@ class ConsumerAnswerWidgetState extends State<ConsumerAnswer> {
                                 MaterialPageRoute(
                                     builder: (context) => SavedAnswers(
                                           id: allSurveys![index].id,
+                                          name: allSurveys![index].surveyName,
                                         )));
                           },
                           child: Stack(

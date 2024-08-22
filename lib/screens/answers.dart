@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 
 class SavedAnswers extends StatefulWidget {
   final String id;
-  const SavedAnswers({required this.id, super.key});
+  final String name;
+  const SavedAnswers({required this.id, required this.name, super.key});
 
   @override
   SavedAnswersWidgetState createState() => SavedAnswersWidgetState();
@@ -18,6 +19,7 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
   List<AnswerOptions>? allAnswers;
   List<AnswerOptions> filteredAnswers = [];
   List<QuestionModel> filteredQuestions = [];
+  Map<String, int> answerCounts = {};
 
   @override
   void initState() {
@@ -53,6 +55,17 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
     filteredQuestions = questions!
         .where((q) => filteredAnswers.any((a) => a.questionId == q.id))
         .toList();
+
+    answerCounts.clear();
+    for (var answerOption in filteredAnswers) {
+      for (var choice in answerOption.userChoice ?? []) {
+        if (answerCounts.containsKey(choice)) {
+          answerCounts[choice] = answerCounts[choice]! + 1;
+        } else {
+          answerCounts[choice] = 1;
+        }
+      }
+    }
   }
 
   @override
@@ -62,8 +75,8 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xff333541),
         centerTitle: true,
-        title: const Text(
-          "Saved Answers",
+        title: Text(
+          widget.name,
           style: TextStyle(color: Colors.white),
         ),
         leading: Builder(
@@ -131,25 +144,45 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
                                 itemBuilder: (BuildContext context, int a) {
                                   final answer =
                                       filteredQuestions[index].answers![a].id;
-                                  print("Checking answer: $answer");
-                                  print(
-                                      "Question ID: ${filteredQuestions[index].id}");
-
-                                  final count = filteredAnswers.where((fa) {
-                                    print("Comparing with: ${fa.userChoice}");
-                                    return fa.questionId ==
-                                            filteredQuestions[index].id &&
-                                        fa.userChoice!.contains(answer);
-                                  }).length;
-
-                                  print("Count for $answer: $count");
-
-                                  return ListTile(
-                                    title: Text(filteredQuestions[index]
-                                        .answers![a]
-                                        .answerText),
-                                    subtitle: Text(count.toString()),
+                                  final count = answerCounts[answer] ?? 0;
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 4),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 5, horizontal: 5),
+                                      decoration: BoxDecoration(
+                                          border: Border.all(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          SizedBox(
+                                            child: Text(filteredQuestions[index]
+                                                .answers![a]
+                                                .answerText),
+                                          ),
+                                          SizedBox(
+                                            child: Text(
+                                                'Count:${count.toString()}'),
+                                          )
+                                        ],
+                                      ),
+                                    ),
                                   );
+                                  // return ListTile(
+                                  //   shape: RoundedRectangleBorder(
+                                  //     side: const BorderSide(
+                                  //         color: Colors.black, width: 1),
+                                  //     borderRadius: BorderRadius.circular(5),
+                                  //   ),
+                                  //   title: Text(filteredQuestions[index]
+                                  //       .answers![a]
+                                  //       .answerText),
+                                  //   subtitle: Text(count.toString()),
+                                  // );
                                 },
                               ),
                             ),

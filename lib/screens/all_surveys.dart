@@ -146,8 +146,9 @@ class AllSurveyWidgetState extends State<AllSurveys> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  SurveyDetailWidget(id: allSurveys![index].id),
+                              builder: (context) => SurveyDetailWidget(
+                                id: allSurveys![index].id,
+                              ),
                             ),
                           );
                         },
