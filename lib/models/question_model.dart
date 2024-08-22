@@ -1,16 +1,17 @@
 import 'dart:convert';
 
-import 'package:admin/models/question_type_model.dart';
-
 class AnswerModel {
+  final String? id;
   late final String answerText;
 
   AnswerModel({
+    this.id,
     required this.answerText,
   });
 
   factory AnswerModel.fromJson(Map<String, dynamic> json) {
     return AnswerModel(
+      id: json['_id'],
       answerText: json['answer_text'],
     );
   }

@@ -13,29 +13,28 @@ class SavedAnswers extends StatefulWidget {
 }
 
 class SavedAnswersWidgetState extends State<SavedAnswers> {
-  List<QuestionModel>? question;
+  List<QuestionModel>? questions;
   bool isLoaded = false;
   List<AnswerOptions>? allAnswers;
-  List<AnswerOptions> myQuestions = [];
-  List<QuestionModel> myQues = [];
+  List<AnswerOptions> filteredAnswers = [];
+  List<QuestionModel> filteredQuestions = [];
 
   @override
   void initState() {
     super.initState();
     getData();
-    myQuestions = [];
   }
 
   Future<void> getData() async {
     try {
-      question = await QuestionRemoteService().getQuestion();
+      questions = await QuestionRemoteService().getQuestion();
       allAnswers = await AnswerOptionsRemoteService().getAnswerOptions();
 
-      if (question != null &&
-          question!.isNotEmpty &&
+      if (questions != null &&
+          questions!.isNotEmpty &&
           allAnswers != null &&
           allAnswers!.isNotEmpty) {
-        getSurveyAnswers();
+        filterSurveyAnswers();
         setState(() {
           isLoaded = true;
         });
@@ -45,37 +44,15 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
     }
   }
 
-  void getSurveyAnswers() {
-    myQuestions.clear();
-    if (question != null && allAnswers != null) {
-      for (var a in allAnswers!) {
-        if (widget.id == a.surveyId) {
-          myQuestions.add(a);
-        }
-      }
-      takedata();
-      print('Total questions: ${question!.length}');
-      print('Total answers: ${allAnswers!.length}');
-      print('Filtered answers: ${myQuestions.length}');
-      for (var answer in myQuestions) {
-        // bool questionExists = question!.any((q) => q.id == answer.questionId);
-        // if (questionExists) {
-        print('Question ID: ${answer.questionId}');
-        print('Survey ID: ${answer.surveyId}');
-        // }
-      }
-    }
-  }
+  void filterSurveyAnswers() {
+    filteredAnswers.clear();
+    filteredAnswers =
+        allAnswers!.where((a) => a.surveyId == widget.id).toList();
 
-  List<QuestionModel> filteredQuestions = [];
-
-  void takedata() {
     filteredQuestions.clear();
-
-    filteredQuestions = question
-            ?.where((q) => myQuestions.any((m) => q.id == m.questionId))
-            .toList() ??
-        [];
+    filteredQuestions = questions!
+        .where((q) => filteredAnswers.any((a) => a.questionId == q.id))
+        .toList();
   }
 
   @override
@@ -126,46 +103,59 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
                 ? ListView.builder(
                     itemCount: filteredQuestions.length,
                     itemBuilder: (BuildContext context, int index) {
-                      if (myQuestions[index].questionId ==
-                          filteredQuestions[index].id) {
-                        return Container(
-                          margin: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            border: Border.all(),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ListTile(
-                                title: const Text("Question"),
-                                subtitle: Text(
-                                  filteredQuestions[index].questionText ??
-                                      "No Text",
-                                ),
+                      return Container(
+                        margin: const EdgeInsets.all(5),
+                        padding: const EdgeInsets.only(bottom: 10),
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ListTile(
+                              title: const Text("Question"),
+                              subtitle: Text(
+                                filteredQuestions[index].questionText ??
+                                    "No Text",
+                                style: const TextStyle(
+                                    color: Colors.black, fontSize: 20),
                               ),
-                              SizedBox(
-                                height: 100,
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: filteredQuestions[index]
-                                          .answers
-                                          ?.length ??
-                                      0,
-                                  itemBuilder: (BuildContext context, int a) {
-                                    return ListTile(
-                                      title: Text(filteredQuestions[index]
-                                              .answers![a]
-                                              .answerText ??
-                                          "No Answer Text"),
-                                    );
-                                  },
-                                ),
+                            ),
+                            SizedBox(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount:
+                                    filteredQuestions[index].answers?.length ??
+                                        0,
+                                itemBuilder: (BuildContext context, int a) {
+                                  final answer =
+                                      filteredQuestions[index].answers![a].id;
+                                  print("Checking answer: $answer");
+                                  print(
+                                      "Question ID: ${filteredQuestions[index].id}");
+
+                                  final count = filteredAnswers.where((fa) {
+                                    print("Comparing with: ${fa.userChoice}");
+                                    return fa.questionId ==
+                                            filteredQuestions[index].id &&
+                                        fa.userChoice!.contains(answer);
+                                  }).length;
+
+                                  print("Count for $answer: $count");
+
+                                  return ListTile(
+                                    title: Text(filteredQuestions[index]
+                                        .answers![a]
+                                        .answerText),
+                                    subtitle: Text(count.toString()),
+                                  );
+                                },
                               ),
-                            ],
-                          ),
-                        );
-                      }
+                            ),
+                          ],
+                        ),
+                      );
                     },
                   )
                 : const Center(child: Text('No questions found'))
