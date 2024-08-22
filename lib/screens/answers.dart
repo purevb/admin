@@ -57,15 +57,16 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
         .toList();
 
     answerCounts.clear();
-    for (var answerOption in filteredAnswers) {
+
+    final counta =
+        filteredAnswers.fold<Map<String, int>>({}, (counts, answerOption) {
       for (var choice in answerOption.userChoice ?? []) {
-        if (answerCounts.containsKey(choice)) {
-          answerCounts[choice] = answerCounts[choice]! + 1;
-        } else {
-          answerCounts[choice] = 1;
-        }
+        counts[choice] = (counts[choice] ?? 0) + 1;
       }
-    }
+      return counts;
+    });
+
+    answerCounts = counta;
   }
 
   @override
@@ -142,9 +143,9 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
                                     filteredQuestions[index].answers?.length ??
                                         0,
                                 itemBuilder: (BuildContext context, int a) {
-                                  final answer =
+                                  final answerId =
                                       filteredQuestions[index].answers![a].id;
-                                  final count = answerCounts[answer] ?? 0;
+                                  final count = answerCounts[answerId] ?? 0;
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 16.0, vertical: 4),
@@ -165,24 +166,12 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
                                                 .answerText),
                                           ),
                                           SizedBox(
-                                            child: Text(
-                                                'Count:${count.toString()}'),
+                                            child: Text('Count: $count'),
                                           )
                                         ],
                                       ),
                                     ),
                                   );
-                                  // return ListTile(
-                                  //   shape: RoundedRectangleBorder(
-                                  //     side: const BorderSide(
-                                  //         color: Colors.black, width: 1),
-                                  //     borderRadius: BorderRadius.circular(5),
-                                  //   ),
-                                  //   title: Text(filteredQuestions[index]
-                                  //       .answers![a]
-                                  //       .answerText),
-                                  //   subtitle: Text(count.toString()),
-                                  // );
                                 },
                               ),
                             ),
