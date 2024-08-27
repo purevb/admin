@@ -55,7 +55,7 @@ class SurveyDetailWidgetState extends State<SurveyDetailWidget> {
               ),
               TextButton(
                 onPressed: () {
-                  removeQuestions(id);
+                  Navigator.pop(context, removeQuestions(id));
                 },
                 child: const Text("Тийм"),
               )

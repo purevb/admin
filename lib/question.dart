@@ -108,8 +108,8 @@ class QuestionWidgetState extends State<QuestionWidget> {
       );
       print(response.body);
       if (response.statusCode == 200) {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => AllSurveys()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const AllSurveys()));
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Questions saved successfully')),
         );

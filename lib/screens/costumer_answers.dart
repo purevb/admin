@@ -1,6 +1,4 @@
-import 'package:admin/models/answer_options.dart';
 import 'package:admin/screens/answers.dart';
-import 'package:admin/services/answer_options_service.dart';
 import 'package:flutter/material.dart';
 import 'package:admin/models/all_survey_model.dart';
 import 'package:admin/services/all_survey.dart';
@@ -54,7 +52,7 @@ class ConsumerAnswerWidgetState extends State<ConsumerAnswer> {
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
             child: isLoaded
                 ? ClipRect(
                     child: GridView.builder(

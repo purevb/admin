@@ -63,7 +63,7 @@ class AllSurveyWidgetState extends State<AllSurveys> {
               ),
               TextButton(
                 onPressed: () {
-                  deleteSurvey(id);
+                  Navigator.pop(context, deleteSurvey(id));
                 },
                 child: const Text("Тийм"),
               )

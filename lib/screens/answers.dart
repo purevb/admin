@@ -78,7 +78,7 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
         centerTitle: true,
         title: Text(
           widget.name,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
         leading: Builder(
           builder: (BuildContext context) {
@@ -117,67 +117,137 @@ class SavedAnswersWidgetState extends State<SavedAnswers> {
                 ? ListView.builder(
                     itemCount: filteredQuestions.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                        margin: const EdgeInsets.all(5),
-                        padding: const EdgeInsets.only(bottom: 10),
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ListTile(
-                              title: const Text("Question"),
-                              subtitle: Text(
-                                filteredQuestions[index].questionText ??
-                                    "No Text",
-                                style: const TextStyle(
-                                    color: Colors.black, fontSize: 20),
+                      if (filteredQuestions[index]
+                          .questionsTypeID!
+                          .contains("66b19afb79959b160726b2c4")) {
+                        return Container(
+                          margin: const EdgeInsets.all(5),
+                          padding: const EdgeInsets.only(bottom: 10),
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ListTile(
+                                title: const Text("Question"),
+                                subtitle: Text(
+                                  filteredQuestions[index].questionText ??
+                                      "No Text",
+                                  style: const TextStyle(
+                                      color: Colors.black, fontSize: 20),
+                                ),
                               ),
-                            ),
-                            SizedBox(
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount:
-                                    filteredQuestions[index].answers?.length ??
-                                        0,
-                                itemBuilder: (BuildContext context, int a) {
-                                  final answerId =
-                                      filteredQuestions[index].answers![a].id;
-                                  final count = answerCounts[answerId] ?? 0;
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16.0, vertical: 4),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 5, horizontal: 5),
-                                      decoration: BoxDecoration(
-                                          border: Border.all(),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          SizedBox(
-                                            child: Text(filteredQuestions[index]
-                                                .answers![a]
-                                                .answerText),
+                              SizedBox(
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: filteredAnswers.length,
+                                  itemBuilder: (BuildContext context, int a) {
+                                    final userChoices =
+                                        filteredAnswers[a].userChoice ?? [];
+                                    return ListView.builder(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemCount: userChoices.length,
+                                      itemBuilder:
+                                          (BuildContext context, int b) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16.0, vertical: 4),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 5, horizontal: 5),
+                                            decoration: BoxDecoration(
+                                                border: Border.all(),
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                SizedBox(
+                                                  child: Text(userChoices[b]),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                          SizedBox(
-                                            child: Text('Count: $count'),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      );
+                            ],
+                          ),
+                        );
+                      } else {
+                        return Container(
+                          margin: const EdgeInsets.all(5),
+                          padding: const EdgeInsets.only(bottom: 10),
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ListTile(
+                                title: const Text("Question"),
+                                subtitle: Text(
+                                  filteredQuestions[index].questionText ??
+                                      "No Text",
+                                  style: const TextStyle(
+                                      color: Colors.black, fontSize: 20),
+                                ),
+                              ),
+                              SizedBox(
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: filteredQuestions[index]
+                                          .answers
+                                          ?.length ??
+                                      0,
+                                  itemBuilder: (BuildContext context, int a) {
+                                    final answerId =
+                                        filteredQuestions[index].answers![a].id;
+                                    final count = answerCounts[answerId] ?? 0;
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16.0, vertical: 4),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 5, horizontal: 5),
+                                        decoration: BoxDecoration(
+                                            border: Border.all(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            SizedBox(
+                                              child: Text(
+                                                  filteredQuestions[index]
+                                                      .answers![a]
+                                                      .answerText),
+                                            ),
+                                            SizedBox(
+                                              child: Text('Count: $count'),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
                     },
                   )
                 : const Center(child: Text('No questions found'))
