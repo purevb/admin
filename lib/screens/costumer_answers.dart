@@ -42,13 +42,6 @@ class ConsumerAnswerWidgetState extends State<ConsumerAnswer> {
             "Survey",
             style: TextStyle(color: Colors.white),
           ),
-          actions: [
-            IconButton(
-              color: Colors.black,
-              onPressed: () {},
-              icon: const Icon(Icons.edit),
-            ),
-          ],
         ),
         body: SingleChildScrollView(
           child: Padding(
