@@ -9,10 +9,9 @@ class AnswerOptionsRemoteService {
       var response = await clientls.get(urils);
       if (response.statusCode == 200) {
         var json = response.body;
-        // print(json);
         return typeFromJson(json);
       } else {
-        print('Server error: ${response.statusCode}');
+        print('Server errorsad : ${response.statusCode}');
       }
     } catch (e) {
       print('Network error: $e');
